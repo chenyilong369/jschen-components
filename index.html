@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <ul>
+    <li><a class="nav" href="#" data-route="/">home</a></li>
+    <li><a class="nav" href="#" data-route="/resume">resume</a></li>
+    <li><a class="nav" href="#" data-route="/contact">contact</a></li>
+  </ul>
+
+  <div id="app">
+    <h1>HomePage</h1>
+  </div>
+
+  <script>
+    const routes = {
+      "/": "home page",
+      "/resume": "my resume",
+      "/contact": "my contact"
+    }
+
+    const handleChange = (key) => {
+      window.history.pushState(null, routes[key], key)
+      document.getElementById('app').innerHTML = `<h1>${routes[key]}</h1>`
+    }
+
+    document.addEventListener('click', (e) => {
+      e.preventDefault()
+      let key = e.target.dataset.route
+      handleChange(key)
+    })
+    window.onpopstate = () => {
+      handleChange(window.location.pathname)
+    }
+  </script>
+</body>
+
+</html>
