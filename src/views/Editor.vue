@@ -1,7 +1,10 @@
 <template>
   <div class="edtior-content">
     <a-row class="content-row">
-      <a-col flex="1" class="left">组件列表</a-col>
+      <a-col flex="1" class="left">
+        <div>组件列表 </div>
+        <ComponentsList :list="componentList" @onItemClick="addItem" />
+      </a-col>
       <a-col flex="2" class="middle">
         <div class="middle-title">
           画布区域
@@ -18,18 +21,27 @@
 
 <script lang="ts">
 import { defineComponent, computed } from 'vue'
+import ComponentsList from '../components/ComponentsList.vue';
+import defaultTextTemplates from '../defaultTemplates'
 import { useStore } from 'vuex'
 import LText from '../components/LText.vue'
 import { GlobalDataProps } from '../store/index'
 export default defineComponent({
   components: {
-    LText
+    LText,
+    ComponentsList
   },
   setup() {
     const store = useStore<GlobalDataProps>();
     const components = computed(() => store.state.editor.components)
+    const componentList = computed(() => defaultTextTemplates)
+    const addItem = (props: any) => {
+      store.commit('addComponent', props)
+    }
     return {
-      components
+      components,
+      addItem,
+      componentList
     }
   }
 })
