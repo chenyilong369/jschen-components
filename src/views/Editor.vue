@@ -10,38 +10,53 @@
           画布区域
         </div>
         <div class="draw">
-          <component :is="component.name" v-bind="component.props" v-for="component in components"
-            :key="component.id" />
+          <EditWrapper v-for="component in components" :key="component.id" :id="component.id" @setActive="setActive"
+            :active="component.id === (currentElement && currentElement.id)">
+            <component :is="component.name" v-bind="component.props" />
+          </EditWrapper>
         </div>
       </a-col>
-      <a-col flex="1" class="right">300px</a-col>
+      <a-col flex="1" class="right">
+        <pre>
+          {{ currentElement ? currentElement.props : '' }}
+        </pre>
+      </a-col>
     </a-row>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, computed } from 'vue'
+import EditWrapper from '../components/EditWrapper.vue'
 import ComponentsList from '../components/ComponentsList.vue';
 import defaultTextTemplates from '../defaultTemplates'
 import { useStore } from 'vuex'
 import LText from '../components/LText.vue'
 import { GlobalDataProps } from '../store/index'
+import { ComponentData } from '../store/editor'
 export default defineComponent({
   components: {
     LText,
-    ComponentsList
+    ComponentsList,
+    EditWrapper
   },
   setup() {
     const store = useStore<GlobalDataProps>();
     const components = computed(() => store.state.editor.components)
     const componentList = computed(() => defaultTextTemplates)
+    const currentElement = computed<ComponentData | null>(() => store.getters.getCurrentElement)
     const addItem = (props: any) => {
       store.commit('addComponent', props)
+    }
+    const setActive = (id: string) => {
+      store.commit('setActive', id)
     }
     return {
       components,
       addItem,
-      componentList
+      componentList,
+      setActive,
+      currentElement
     }
   }
 })

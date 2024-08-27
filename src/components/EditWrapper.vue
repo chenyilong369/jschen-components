@@ -1,5 +1,7 @@
 <template>
-  <div class="edit-wrapper"></div>
+  <div class="edit-wrapper" @click="onItemClick(id)" :class="{ active: active }">
+    <slot></slot>
+  </div>
 </template>
 
 <script lang="ts">
@@ -9,12 +11,25 @@ export default defineComponent({
     id: {
       type: String,
       required: true
+    },
+    active: {
+      type: Boolean,
+      default: false
+    }
+  },
+  emits: ['set-active'],
+  setup(props, context) {
+    const onItemClick = (id: string) => {
+      context.emit('set-active', id)
+    }
+    return {
+      onItemClick
     }
   }
 })
 </script>
 
-<style lang="scss" scoped> 
+<style lang="scss" scoped>
 .edit-wrapper {
   padding: 0;
   cursor: pointer;
@@ -22,11 +37,14 @@ export default defineComponent({
   user-select: none;
 
   &:hover {
-    border: 1px solid #ccc;
+    border: 1px dashed #ccc;
   }
 
-  &:active {
-    border: 1px solid #1890ff
-  }
+
+}
+
+.active {
+  border: 1px solid #1890ff;
+  z-index: 1500;
 }
 </style>

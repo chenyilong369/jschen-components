@@ -8,7 +8,7 @@ export interface EditorProps {
   currentElement: string; // 当前选中组件id
 }
 
-interface ComponentData {
+export interface ComponentData {
   props: { [key: string]: any };
   id: string;
   name: string;
@@ -33,6 +33,14 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         props
       }
       state.components.push(newComponent)
+    },
+    setActive(state, currentId: string) {
+      state.currentElement = currentId
+    }
+  },
+  getters: {
+    getCurrentElement: (state) => {
+      return state.components.find((item) => item.id === state.currentElement)
     }
   }
 }
