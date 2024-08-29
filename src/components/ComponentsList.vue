@@ -16,14 +16,14 @@ export default defineComponent({
       required: true
     }
   },
-  emits: ['on-item-click'],
+  emits: ['itemClick'],
   name: 'components-list',
   components: {
     LText
   },
   setup(props, context) {
     const onItemClick = (data: any) => {
-      context.emit("on-item-click", data)
+      context.emit("itemClick", data)
     };
     return {
       onItemClick

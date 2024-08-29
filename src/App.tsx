@@ -1,18 +1,14 @@
-<template>
-  <Index />
-</template>
-
-<script lang="ts">
 import { defineComponent } from 'vue';
-import Index from './views/Index.vue'
+import Index from './views/Index.tsx'
 
 export default defineComponent({
   name: 'App',
   components: {
     Index
+  },
+  setup() {
+    return () => (
+      <Index />
+    )
   }
 });
-</script>
-
-<style>
-</style>
