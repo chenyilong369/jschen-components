@@ -1,10 +1,10 @@
 import { defineComponent, computed, h, resolveComponent } from 'vue'
 import EditWrapper from '../components/EditWrapper.tsx'
-import ComponentsList from '../components/ComponentsList.vue';
+import ComponentsList from '../components/ComponentsList.tsx';
 import defaultTextTemplates from '../defaultTemplates'
 import { useStore } from 'vuex'
 import '@/styles/Editor.scss'
-import LText from '../components/LText.vue'
+import LText from '../components/LText.tsx'
 import { GlobalDataProps } from '../store/index'
 import { ComponentData } from '../store/editor'
 export default defineComponent({
