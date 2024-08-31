@@ -1,6 +1,7 @@
 import { TextComponentProps } from '@/defaultProps'
 import { mapPropsToForms, PropToForms } from '@/propsMap'
 import { reduce } from 'lodash-es'
+import '@/styles/components/PropsTable.scss'
 import { defineComponent, computed, PropType, h, resolveComponent } from 'vue'
 export default defineComponent({
   name: 'props-table',
@@ -30,10 +31,16 @@ export default defineComponent({
             return (
               <div class="prop-item" key={key}>
                 {
-                  value ? h(resolveComponent(value.component), { value: value.value }) : ''
+                  value?.text ? <span class="label">{value.text}</span> : ''
                 }
+                <div class="prop-component">
+                  {
+                    value ? h(resolveComponent(value.component), { value: value.value, ...value.extraProps }) : ''
+                  }
+                </div>
               </div>
-            )})
+            )
+          })
         }
       </div>
     )
