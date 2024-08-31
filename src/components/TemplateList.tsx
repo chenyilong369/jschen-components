@@ -12,7 +12,7 @@ export default defineComponent({
   setup(props) {
     return () => (
       <div class="template-list-component">
-        <a-row gutter="16">
+        <a-row gutter={16}>
           {
             props.list && props.list.map(item => (
               <a-col span="6" key={item.id} class="poster-item">
@@ -21,7 +21,7 @@ export default defineComponent({
                     cover: () => (
                       <>
                         {
-                          item.coverImg ? <img src={item.coverImg} v-if="item.coverImg" /> : (
+                          item.coverImg ? <img src={item.coverImg} /> : (
                             <img src="http://typescript-vue.oss-cn-beijing.aliyuncs.com/vue-marker/5f81cca3f3bf7a0e1ebaf885.png" />
                           )
                         }
@@ -45,13 +45,13 @@ export default defineComponent({
                   <div class="tag-list">
                     {
                       item.isHot ?
-                        (<a-tag color="red" v-if="">
+                        (<a-tag color="red">
                           HOT
                         </a-tag>) : ''
                     }
                     {
                       item.isNew ?
-                        (<a-tag color="green" v-if="">
+                        (<a-tag color="green">
                           NEW
                         </a-tag>) : ''
                     }

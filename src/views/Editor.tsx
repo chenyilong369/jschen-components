@@ -7,10 +7,12 @@ import '@/styles/Editor.scss'
 import LText from '../components/LText.tsx'
 import { GlobalDataProps } from '../store/index'
 import { ComponentData } from '../store/editor'
+import PropsTable from '@/components/PropsTable.tsx';
 export default defineComponent({
   name: 'Editor',
   components: {
     LText,
+    PropsTable,
     ComponentsList,
     EditWrapper
   },
@@ -55,6 +57,9 @@ export default defineComponent({
             </div>
           </a-col>
           <a-col flex="1" class="right">
+            {
+              currentElement.value?.props ? <PropsTable props={currentElement.value.props} /> : ''
+            }
             <pre>
               { Object.keys(currentElement.value?.props || {}).map(item => {
                 return (

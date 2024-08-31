@@ -1,4 +1,4 @@
-import { defineComponent, h, resolveComponent } from 'vue';
+import { defineComponent, h, resolveDynamicComponent } from 'vue';
 import useComponentCommon from '../hooks/useComponentCommon'
 import '@/styles/components/LText.scss'
 import { transformToComponentProps, textDefaultProps, textStylePropsName } from '../defaultProps'
@@ -14,12 +14,14 @@ export default defineComponent({
   },
   setup(props) {
     const { styleProps, handleClick } = useComponentCommon(props, textStylePropsName)
-    return () => (
+    return () => {
+      const Component = resolveDynamicComponent(props.tag)
+      return (
       <>
         {
-          h(resolveComponent(props.tag), { style: styleProps.value, class: "l-text-component", onClick: handleClick }, props.text)
+          h(Component.toString(), { style: styleProps.value, class: "l-text-component", onClick: handleClick }, props.text)
         }
       </>
-    )
+    )}
   }
 })

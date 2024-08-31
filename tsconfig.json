@@ -4,7 +4,7 @@
     "module": "esnext",
     "strict": true,
     "jsx": "preserve",
-        "jsxImportSource": "vue",
+    "jsxImportSource": "vue",
     "allowImportingTsExtensions": true,
     "importHelpers": true,
     "noEmit": true,

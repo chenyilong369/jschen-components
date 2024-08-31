@@ -18,7 +18,7 @@ export default defineComponent({
       <>
         {
           withHeader.value ? (
-            <div class="homepage-container" v-if="withHeader">
+            <div class="homepage-container">
               <a-layout style={{ background: '#fff' }}>
                 <a-layout-header class="header">
                   <router-link to="/">
