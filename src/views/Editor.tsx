@@ -27,6 +27,9 @@ export default defineComponent({
     const setActive = (id: string) => {
       store.commit('setActive', id)
     }
+    const handleChange = (e: any) => {
+      console.log(e, 'sd')
+    }
     return () => (
       <div class="edtior-content">
         <a-row class="content-row">
@@ -58,7 +61,7 @@ export default defineComponent({
           </a-col>
           <a-col flex="1" class="right">
             {
-              currentElement.value?.props ? <PropsTable props={currentElement.value.props} /> : ''
+              currentElement.value?.props ? <PropsTable props={currentElement.value.props} onChange={handleChange} /> : ''
             }
             <pre>
               { Object.keys(currentElement.value?.props || {}).map(item => {
