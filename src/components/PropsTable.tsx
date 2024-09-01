@@ -16,7 +16,7 @@ export default defineComponent({
         const newKey = key as keyof TextComponentProps
         const item = mapPropsToForms[newKey]
         if (item) {
-          item.value = value
+          item.value = item.initalTransform ? item.initalTransform(value) : value
           result[newKey] = item
         }
         return result
@@ -35,7 +35,19 @@ export default defineComponent({
                 }
                 <div class="prop-component">
                   {
-                    value ? h(resolveComponent(value.component), { value: value.value, ...value.extraProps }) : ''
+                    value ? h(resolveComponent(value.component), { value: value.value, ...value.extraProps }, {
+                      default: () => (
+                        value.options && value.subComponent ? value.options.map((option) => (
+                          <>
+                            {
+                              h(resolveComponent(value.subComponent!), {key: option.value, value: option.value}, {
+                                default: () => option.text,
+                              })
+                            }
+                          </>
+                        )) : undefined
+                      )
+                    }) : ''
                   }
                 </div>
               </div>

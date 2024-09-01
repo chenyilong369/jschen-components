@@ -15,9 +15,9 @@ export interface ComponentData {
 }
 
 export const testComponents = [
-  { id: v4(), name: 'l-text', props: {text: 'hello1', fontSize: '12px', lineHeight: '1', color: 'red'} },
-  { id: v4(), name: 'l-text', props: {text: 'hello2', fontSize: '24px', lineHeight: '2' } },
-  { id: v4(), name: 'l-text', props: {text: 'hello3', fontSize: '36px', url: '', actionType: 'url'} }
+  { id: v4(), name: 'l-text', props: {text: 'hello1', fontSize: '12px', lineHeight: '1', textAlign: 'left', color: 'red'} },
+  { id: v4(), name: 'l-text', props: {text: 'hello2', fontSize: '24px', lineHeight: '2', textAlign: 'right' } },
+  { id: v4(), name: 'l-text', props: {text: 'hello3', fontSize: '36px', url: '', actionType: 'url', fontFamily: ''} }
 ]
 
 const editor: Module<EditorProps, GlobalDataProps> = {
