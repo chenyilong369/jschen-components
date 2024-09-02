@@ -1,12 +1,14 @@
+import { VNode, h } from "vue";
 import { TextComponentProps } from "./defaultProps";
 
 export interface PropToForm {
   component: string;
   subComponent?: string;
-  text?: string;
+  text?: string | VNode;
   extraProps?: {[key: string]: any};
-  options?: { text: string; value: any }[];
+  options?: { text: string | VNode; value: any }[];
   initalTransform?: (v: any) => any;
+  afterTransform?: (v: any) => any;
   valueProp?: string;
   eventName?: string;
 }
@@ -14,16 +16,34 @@ export interface PropToForm {
 export type PropToForms = {
   [P in keyof TextComponentProps]? : PropToForm
 }
+const fontFamilyArr = [
+  { text: '宋体', value: '"SimSun","STSong"' },
+  { text: '黑体', value: '"SimHei","STHeiti"' },
+  { text: '楷体', value: '"KaiTi","STKaiti"' },
+  { text: '仿宋', value: '"FangSong","STFangsong"' }, 
+]
+
+const fontFamilyOptions = fontFamilyArr.map(item => {
+  return {
+    value: item.value,
+    text: h('span', {style: {fontFamily: item.value}}, item.text)
+  }
+})
 
 export const mapPropsToForms: PropToForms = {
   text: {
     text: '文本',
-    component: 'a-input', 
+    component: 'a-textarea', 
+    extraProps: {
+      rows: 3
+    },
+    afterTransform: (e: any) => e.target.value
   },
-  fontSize: {
+   fontSize: {
     text: '字号',
     component: 'a-input-number',
-    initalTransform: (v: string) => parseInt(v)
+    initalTransform: (v: string) => parseInt(v),
+    afterTransform: (e: number) => e ? `${e}px` : ''
   },
   lineHeight: {
     text: '行高',
@@ -33,7 +53,8 @@ export const mapPropsToForms: PropToForms = {
       max: 3,
       step: 0.1
     },
-    initalTransform: (v: string) => parseFloat(v)
+    initalTransform: (v: string) => parseFloat(v),
+    afterTransform: (e: number) => e.toString()
   },
   textAlign: {
     component: 'a-radio-group',
@@ -43,7 +64,8 @@ export const mapPropsToForms: PropToForms = {
       { value: 'left', text: '左' },
       { value: 'center', text: '中' },
       { value: 'right', text: '右' }
-    ]
+    ],
+    afterTransform: (e: any) => e.target.value
   },
   fontFamily: {
     component: 'a-select',
@@ -51,10 +73,7 @@ export const mapPropsToForms: PropToForms = {
     text: '字体',
     options: [
       { text: '无', value: ''},
-      { text: '宋体', value: '"SimSun","STSong"' },
-      { text: '黑体', value: '"SimHei","STHeiti"' },
-      { text: '楷体', value: '"KaiTi","STKaiti"' },
-      { text: '仿宋', value: '"FangSong","STFangsong"' },
+      ...fontFamilyOptions,
     ],
     extraProps: {
       style: "width: 100%"

@@ -28,7 +28,7 @@ export default defineComponent({
       store.commit('setActive', id)
     }
     const handleChange = (e: any) => {
-      console.log(e, 'sd')
+      store.commit('updateComponent', e)
     }
     return () => (
       <div class="edtior-content">

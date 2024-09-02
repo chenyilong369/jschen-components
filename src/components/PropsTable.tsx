@@ -2,16 +2,16 @@ import { TextComponentProps } from '@/defaultProps'
 import { mapPropsToForms, PropToForms } from '@/propsMap'
 import { reduce } from 'lodash-es'
 import '@/styles/components/PropsTable.scss'
-import { defineComponent, computed, PropType, h, resolveComponent } from 'vue'
+import { defineComponent, computed, PropType, h, resolveComponent, VNode } from 'vue'
 import { transformEventName } from '@/utils/transform'
 
 interface FormProps {
   component: string;
   subComponent?: string;
-  text?: string;
+  text?: string | VNode;
   value: string;
   extraProps?: {[key: string]: any};
-  options?: { text: string; value: any }[];
+  options?: { text: string | VNode; value: any }[];
   initalTransform?: (v: any) => any;
   valueProp: string;
   eventName: string;
@@ -32,14 +32,16 @@ export default defineComponent({
         const newKey = key as keyof TextComponentProps
         const item = mapPropsToForms[newKey]
         if (item) {
-          const {valueProp = 'value', eventName = 'change', initalTransform} = item
+          const {valueProp = 'value', eventName = 'change', initalTransform, afterTransform} = item
           const newItem: FormProps = {
             ...item,
             valueProp,
             eventName,
             value: initalTransform ? initalTransform(value) : value,
             events: {
-              [transformEventName(eventName)]: (e: any) => { context.emit('change', { key, value: e }) }
+              [transformEventName(eventName)]: (e: any) => { 
+                context.emit('change', { key, value: afterTransform ? afterTransform(e) : e }) 
+              }
             }
           }
           result[newKey] = newItem

@@ -36,6 +36,12 @@ const editor: Module<EditorProps, GlobalDataProps> = {
     },
     setActive(state, currentId: string) {
       state.currentElement = currentId
+    },
+    updateComponent(state, {key, value}) {
+      const updateComponent = state.components.find((item) => item.id === state.currentElement)
+      if (updateComponent) {
+        updateComponent.props[key] = value
+      }
     }
   },
   getters: {
