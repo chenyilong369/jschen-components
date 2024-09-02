@@ -23,6 +23,15 @@ const fontFamilyArr = [
   { text: '仿宋', value: '"FangSong","STFangsong"' }, 
 ]
 
+const pxToNumberComponent = (text: string) => {
+  return {
+    text,
+    component: 'a-input-number',
+    initalTransform: (v: string) => parseInt(v),
+    afterTransform: (e: number) => typeof e === 'number' ? `${e}px` : ''
+  }
+}
+
 const fontFamilyOptions = fontFamilyArr.map(item => {
   return {
     value: item.value,
@@ -39,12 +48,7 @@ export const mapPropsToForms: PropToForms = {
     },
     afterTransform: (e: any) => e.target.value
   },
-   fontSize: {
-    text: '字号',
-    component: 'a-input-number',
-    initalTransform: (v: string) => parseInt(v),
-    afterTransform: (e: number) => e ? `${e}px` : ''
-  },
+  fontSize: pxToNumberComponent('字号'),
   lineHeight: {
     text: '行高',
     component: 'a-slider',
@@ -76,7 +80,55 @@ export const mapPropsToForms: PropToForms = {
       ...fontFamilyOptions,
     ],
     extraProps: {
-      style: "width: 100%"
+      style: "width: 80%"
     }
-  }
+  },
+  width: pxToNumberComponent('宽度'),
+  height: pxToNumberComponent('高度'),
+  paddingLeft: pxToNumberComponent('左边距'),
+  paddingRight: pxToNumberComponent('右边距'),
+  paddingTop: pxToNumberComponent('上边距'),
+  paddingBottom: pxToNumberComponent('下边距'),
+  borderStyle: {
+    component: 'a-select',
+    subComponent: 'a-select-option',
+    text: '边框类型',
+    extraProps: {
+      style: "width: 80%"
+    },
+    options: [
+      { value: 'none', text: '无' },
+      { value: 'solid', text: '实线' },
+      { value: 'dashed', text: '破折线' },
+      { value: 'dotted', text: '点状线' }
+    ]
+  },
+  borderWidth: {
+    ...pxToNumberComponent('边框宽度'),
+    component: 'a-slider',
+    extraProps:{
+      min: 0,
+      max: 20
+    }
+  },
+  borderRadius: {
+    ...pxToNumberComponent('边框圆角'),
+    component: 'a-slider',
+    extraProps:{
+      min: 0,
+      max: 200
+    }
+  },
+  opacity: {
+    component: 'a-slider',
+    initalTransform: (v: number) => v ? v * 100 : 100,
+    afterTransform: (e: number) => (e / 100),
+    extraProps: {
+      min: 0,
+      max: 100,
+      reverse: true
+    } 
+  },
+  left: pxToNumberComponent('X轴坐标'),
+  top: pxToNumberComponent('Y轴坐标')
 }
