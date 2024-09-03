@@ -34,6 +34,9 @@ const editor: Module<EditorProps, GlobalDataProps> = {
       }
       state.components.push(newComponent)
     },
+    deleteComponent(state) {
+      state.components = state.components.filter(component => component.id !== state.currentElement)
+    },
     setActive(state, currentId: string) {
       state.currentElement = currentId
     },

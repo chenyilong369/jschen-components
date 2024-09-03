@@ -30,6 +30,9 @@ export default defineComponent({
     const handleChange = (e: any) => {
       store.commit('updateComponent', e)
     }
+    const deleteComponent = () => {
+      store.commit('deleteComponent')
+    }
     return () => (
       <div class="edtior-content">
         <a-row class="content-row">
@@ -63,6 +66,7 @@ export default defineComponent({
             {
               currentElement.value?.props ? <PropsTable props={currentElement.value.props} onChange={handleChange} /> : ''
             }
+            {  currentElement.value ? <a-button type="primary" onClick={deleteComponent}>删除组件</a-button> : ''}
             <pre>
               { Object.keys(currentElement.value?.props || {}).map(item => {
                 return (
