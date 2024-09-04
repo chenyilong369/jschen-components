@@ -33,9 +33,9 @@ export default defineComponent({
               登录
             </a-button>
           ) : (
-            <a-dropdown-button v-slots={{
+            <a-dropdown-button class="user-profile-component" v-slots={{
               overlay: () => (
-                <a-menu>
+                <a-menu class="user-profile-dropdown">
                   <a-menu-item key="0" onClick={logout}>登出</a-menu-item>
                 </a-menu>
               )
