@@ -3,7 +3,7 @@ import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import '@/styles/Index.scss'
 import { GlobalDataProps } from '../store/index'
-import UserProfile from '../components/UserProfile.tsx'
+import UserProfile from '../components/UserProfile'
 export default defineComponent({
   name: 'Index',
   components: {

@@ -1,13 +1,13 @@
 import { defineComponent, computed, h, resolveComponent } from 'vue'
-import EditWrapper from '../components/EditWrapper.tsx'
-import ComponentsList from '../components/ComponentsList.tsx';
+import EditWrapper from '../components/EditWrapper'
+import ComponentsList from '../components/ComponentsList';
 import defaultTextTemplates from '../defaultTemplates'
 import { useStore } from 'vuex'
 import '@/styles/Editor.scss'
-import LText from '../components/LText.tsx'
+import LText from '../components/LText'
 import { GlobalDataProps } from '../store/index'
 import { ComponentData } from '../store/editor'
-import PropsTable from '@/components/PropsTable.tsx';
+import PropsTable from '@/components/PropsTable';
 export default defineComponent({
   name: 'Editor',
   components: {

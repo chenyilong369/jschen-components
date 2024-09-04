@@ -2,7 +2,7 @@ import { defineComponent, computed } from 'vue'
 import { useStore } from 'vuex'
 import '@/styles/Home.scss'
 import { GlobalDataProps } from '../store/index'
-import TemplateList from '../components/TemplateList.tsx'
+import TemplateList from '../components/TemplateList'
 export default defineComponent({
   components: {
     TemplateList

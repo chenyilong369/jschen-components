@@ -1,5 +1,5 @@
 import { defineComponent } from 'vue'
-import LText from './LText.tsx'
+import LText from './LText'
 export default defineComponent({
   props: {
     list: {
