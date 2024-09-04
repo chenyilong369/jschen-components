@@ -17,7 +17,7 @@ export const testData: TemplateProps[] = [
     coverImg: "https://images.pexels.com/photos/27582996/pexels-photo-27582996/free-photo-of-a-statue-of-arco-da-rua-augusto-in-lisbon.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
     author: "jschen",
     copiedCount: 10,
-    title: "sdasd",
+    title: "sdasd1",
     isHot: true,
     isNew: true,
   },
