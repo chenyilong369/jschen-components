@@ -1,8 +1,8 @@
 import { TextComponentProps } from "@/defaultProps";
 import store from "@/store";
-import { testComponents } from "@/store/editor";
+import { ComponentData, testComponents } from "@/store/editor";
 import { testData } from "@/store/templates";
-import { clone } from "lodash";
+import { clone, last } from "lodash";
 const cloneComponents = clone(testComponents)
 
 describe('test vuex', () => {
@@ -50,6 +50,17 @@ describe('test vuex', () => {
       }
       store.commit('addComponent', payload)
       expect(store.state.editor.components).toHaveLength(cloneComponents.length + 1)
+      const lastItem = last(store.state.editor.components)
+      expect(lastItem?.props.text).toBe('text1')
+    })
+    it('update component should work fine', () => {
+      const newProps = {
+        key: 'text',
+        value: 'update'
+      }
+      store.commit('updateComponent', newProps)
+      const currentElement: ComponentData = store.getters.getCurrentElement
+      expect(currentElement.props.text).toBe('update')
     })
   })
 })
