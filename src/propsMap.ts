@@ -83,6 +83,10 @@ export const mapPropsToForms: PropToForms = {
       style: "width: 80%"
     }
   },
+  color: {
+    component: 'color-picker',
+    text: '字体颜色'
+  },
   width: pxToNumberComponent('宽度'),
   height: pxToNumberComponent('高度'),
   paddingLeft: pxToNumberComponent('左边距'),

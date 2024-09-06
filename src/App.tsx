@@ -1,5 +1,5 @@
 import { defineComponent } from 'vue';
-import Index from './views/Index.tsx'
+import Index from './views/Index'
 
 export default defineComponent({
   name: 'App',

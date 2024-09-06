@@ -4,6 +4,7 @@ import { reduce } from 'lodash-es'
 import '@/styles/components/PropsTable.scss'
 import { defineComponent, computed, PropType, h, resolveComponent, VNode } from 'vue'
 import { transformEventName } from '@/utils/transform'
+import ColorPicker from './ColorPicker'
 
 interface FormProps {
   component: string;
@@ -24,6 +25,9 @@ export default defineComponent({
     props: {
       type: Object as PropType<{ [key: string]: any }>
     }
+  },
+  components: {
+    ColorPicker
   },
   emits: ['change'],
   setup(props, context) {

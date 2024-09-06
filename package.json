@@ -12,6 +12,7 @@
     "ant-design-vue": "^4.2.3",
     "core-js": "^3.6.5",
     "lodash-es": "^4.17.21",
+    "rgb-hex": "^3.0.0",
     "uuid": "^10.0.0",
     "vue": "^3.0.0",
     "vue-router": "^4.4.3",
