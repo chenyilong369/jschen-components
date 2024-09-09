@@ -39,6 +39,8 @@ describe('Uploader Component', () => {
     expect(firstItem.classes()).toContain('uploading')
     await flushPromises()
     expect(wrapper.get('button span').text()).toBe('上传成功')
+    expect(firstItem.classes()).toContain('upload-success')
+    expect(firstItem.get('.filename').text()).toBe(testFile.name)
   })
 
   it('should return error when error', async () => {
@@ -48,5 +50,10 @@ describe('Uploader Component', () => {
     expect(wrapper.get('button span').text()).toBe('正在上传')
     await flushPromises()
     expect(wrapper.get('button span').text()).toBe('上传失败')
+    expect(wrapper.findAll('li').length).toBe(2)
+    const lastItem = wrapper.get('li:last-child')
+    expect(lastItem.classes()).toContain('upload-error')
+    await lastItem.get('.delete-icon').trigger('click')
+    expect(wrapper.findAll('li').length).toBe(1)
   })
 })
