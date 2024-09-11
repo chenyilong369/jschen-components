@@ -63,6 +63,10 @@ export default defineComponent({
           }
         }).catch(() => {
           fileObj.status = 'error'
+        }).finally(() => {
+          if(fileInput.value) {
+            fileInput.value.value = ''
+          }
         })
       }
     }
