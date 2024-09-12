@@ -2,6 +2,7 @@ import { computed, defineComponent, reactive, ref } from "vue";
 import axios from 'axios'
 import { v4 } from "uuid";
 import '@/styles/components/Uploader.scss'
+import { DeleteOutlined, LoadingOutlined, FileOutlined } from '@ant-design/icons-vue'
 
 type UploadStatus = 'ready' | 'success' | 'error' | 'loading'
 interface UploadFile {
@@ -19,6 +20,11 @@ export default defineComponent({
       type: String,
       required: true
     }
+  },
+  components: {
+    DeleteOutlined,
+    LoadingOutlined,
+    FileOutlined
   },
   setup(props) {
     const fileInput = ref<null | HTMLInputElement>(null)
@@ -64,7 +70,7 @@ export default defineComponent({
         }).catch(() => {
           fileObj.status = 'error'
         }).finally(() => {
-          if(fileInput.value) {
+          if (fileInput.value) {
             fileInput.value.value = ''
           }
         })
@@ -79,13 +85,18 @@ export default defineComponent({
           }
         </button>
         <input ref={fileInput} onChange={(e) => handleChangeFiles(e)} type="file" style={{ display: 'none' }} />
-        <ul>
+        <ul class="upload-list">
           {
             uploadedFiles.value.map((file) => {
               return (
                 <li class={`uploaded-file upload-${file.status}`} key={file.uid}>
-                  <span class="filename">{ file.name }</span>
-                  <button class="delete-icon" onClick={() =>removeFile(file.uid)}>Del</button>
+                  <span class="file-icon">
+                    {
+                      file.status === 'loading' ? <LoadingOutlined/> : <FileOutlined/>
+                    }
+                  </span>
+                  <span class="filename">{file.name}</span>
+                  <span class="delete-icon" onClick={() => removeFile(file.uid)}><DeleteOutlined /></span>
                 </li>
               )
             })
