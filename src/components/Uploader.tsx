@@ -3,6 +3,7 @@ import axios from 'axios'
 import { v4 } from "uuid";
 import '@/styles/components/Uploader.scss'
 import { DeleteOutlined, LoadingOutlined, FileOutlined } from '@ant-design/icons-vue'
+import { last } from "lodash-es";
 
 type UploadStatus = 'ready' | 'success' | 'error' | 'loading'
 interface UploadFile {
@@ -11,6 +12,7 @@ interface UploadFile {
   size: number;
   name: string;
   status: UploadStatus;
+  resp?: any;
 }
 
 export default defineComponent({
@@ -32,6 +34,18 @@ export default defineComponent({
     const isUploading = computed(() => {
       return uploadedFiles.value.some(item => item.status === 'loading')
     })
+
+    const lastFileData = computed(() => {
+      const lastFile = last(uploadedFiles.value)
+      if (lastFile) {
+        return {
+          loaded: lastFile.status === 'success',
+          data: lastFile.resp
+        }
+      }
+      return false
+    })
+
     const triggerUpload = () => {
       if (fileInput.value) fileInput.value.click()
     }
@@ -66,6 +80,7 @@ export default defineComponent({
           }
           else {
             fileObj.status = 'success'
+            fileObj.resp = resp.data
           }
         }).catch(() => {
           fileObj.status = 'error'
@@ -79,11 +94,9 @@ export default defineComponent({
 
     return () => (
       <div class="file-upload">
-        <button onClick={triggerUpload} disabled={isUploading.value}>
-          {
-            isUploading.value ? <span>正在上传</span> : <span>点击上传</span>
-          }
-        </button>
+        <div onClick={triggerUpload}>
+          
+        </div>
         <input ref={fileInput} onChange={(e) => handleChangeFiles(e)} type="file" style={{ display: 'none' }} />
         <ul class="upload-list">
           {
