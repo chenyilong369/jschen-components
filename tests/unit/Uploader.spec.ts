@@ -39,7 +39,7 @@ describe('Uploader Component', () => {
 
   it("before update basic layout", () => {
     expect(wrapper.find('button').exists()).toBeTruthy()
-    expect(wrapper.get('button span').text()).toBe('点击上传')
+    expect(wrapper.get('button').text()).toBe('点击上传')
     expect(wrapper.get('input').isVisible()).toBeFalsy()
   })
 
@@ -49,13 +49,13 @@ describe('Uploader Component', () => {
     setInputValue(fileInput)
     await wrapper.get('input').trigger('change')
     expect(mockedAxios.post).toHaveBeenCalledTimes(1)
-    expect(wrapper.get('button span').text()).toBe('正在上传')
+    expect(wrapper.get('button').text()).toBe('正在上传')
     expect(wrapper.get('button').attributes()).toHaveProperty('disabled')
     expect(wrapper.findAll('li').length).toBe(1)
     const firstItem = wrapper.get('li:first-child')
     expect(firstItem.classes()).toContain('upload-loading')
     await flushPromises()
-    expect(wrapper.get('button span').text()).toBe('点击上传')
+    expect(wrapper.get('button').text()).toBe('点击上传')
     expect(firstItem.classes()).toContain('upload-success')
     expect(firstItem.get('.filename').text()).toBe(testFile.name)
   })
@@ -64,9 +64,9 @@ describe('Uploader Component', () => {
     mockedAxios.post.mockResolvedValueOnce(Promise.resolve().catch(e => ({error: 'error'})))
     await wrapper.get('input').trigger('change')
     expect(mockedAxios.post).toHaveBeenCalledTimes(2)
-    expect(wrapper.get('button span').text()).toBe('正在上传')
+    expect(wrapper.get('button').text()).toBe('正在上传')
     await flushPromises()
-    expect(wrapper.get('button span').text()).toBe('点击上传')
+    expect(wrapper.get('button').text()).toBe('点击上传')
     expect(wrapper.findAll('li').length).toBe(2)
     const lastItem = wrapper.get('li:last-child')
     expect(lastItem.classes()).toContain('upload-error')
@@ -74,8 +74,9 @@ describe('Uploader Component', () => {
     expect(wrapper.findAll('li').length).toBe(1)
   })
 
-  it.only('should show the current component when using custom slot', async () => {
+  it('should show the current component when using custom slot', async () => {
     mockedAxios.post.mockResolvedValueOnce(Promise.resolve().then(() => ({data: {url: 'test1.url'}})))
+    mockedAxios.post.mockResolvedValueOnce(Promise.resolve().then(() => ({data: {url: 'test2.url'}})))
     const wrapper = mount(Uploader, {
       props: {
         action: 'test.url'
@@ -84,8 +85,8 @@ describe('Uploader Component', () => {
         default: '<button>Custom slot</button>',
         loading: '<div class="loading">loading slot</div>',
         uploaded: `
-          <template #uploaded="{uploadData}">
-            <div class="custom-loaded">{{ uploadData.url }}</div>
+          <template #uploaded="{uploadedData}">
+           <div><div class="custom-loaded" >{{ uploadedData.url }}</div></div>
           </template>
         `
       },
@@ -100,5 +101,9 @@ describe('Uploader Component', () => {
     expect(wrapper.get('.loading').text()).toBe('loading slot')
     await flushPromises()
     expect(wrapper.get('.custom-loaded').text()).toBe('test1.url')
+    await wrapper.get('input').trigger('change')
+    expect(wrapper.get('.loading').text()).toBe('loading slot')
+    await flushPromises()
+    expect(wrapper.get('.custom-loaded').text()).toBe('test2.url')
   })
 })

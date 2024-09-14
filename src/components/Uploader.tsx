@@ -3,7 +3,7 @@ import axios from 'axios'
 import { v4 } from "uuid";
 import '@/styles/components/Uploader.scss'
 import { DeleteOutlined, LoadingOutlined, FileOutlined } from '@ant-design/icons-vue'
-import { last } from "lodash-es";
+import { last } from "lodash";
 
 type UploadStatus = 'ready' | 'success' | 'error' | 'loading'
 interface UploadFile {
@@ -28,7 +28,7 @@ export default defineComponent({
     LoadingOutlined,
     FileOutlined
   },
-  setup(props) {
+  setup(props, { slots }) {
     const fileInput = ref<null | HTMLInputElement>(null)
     const uploadedFiles = ref<UploadFile[]>([])
     const isUploading = computed(() => {
@@ -92,10 +92,23 @@ export default defineComponent({
       }
     }
 
+
     return () => (
       <div class="file-upload">
         <div onClick={triggerUpload}>
-          
+          {
+            (() => {
+              if (isUploading.value) {
+                return slots.loading ? slots.loading() : <button disabled>正在上传</button>
+              } else if (lastFileData.value && lastFileData.value.loaded) {
+                return slots.uploaded ? slots.uploaded({
+                  uploadedData: lastFileData.value.data
+                },) : <button>点击上传</button>
+              } else {
+                return slots.default ? slots.default() : <button>点击上传</button>
+              }
+            })()
+          }
         </div>
         <input ref={fileInput} onChange={(e) => handleChangeFiles(e)} type="file" style={{ display: 'none' }} />
         <ul class="upload-list">
@@ -105,7 +118,7 @@ export default defineComponent({
                 <li class={`uploaded-file upload-${file.status}`} key={file.uid}>
                   <span class="file-icon">
                     {
-                      file.status === 'loading' ? <LoadingOutlined/> : <FileOutlined/>
+                      file.status === 'loading' ? <LoadingOutlined /> : <FileOutlined />
                     }
                   </span>
                   <span class="filename">{file.name}</span>
