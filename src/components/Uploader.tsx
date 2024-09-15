@@ -1,4 +1,4 @@
-import { computed, defineComponent, reactive, ref } from "vue";
+import { computed, defineComponent, PropType, reactive, ref } from "vue";
 import axios from 'axios'
 import { v4 } from "uuid";
 import '@/styles/components/Uploader.scss'
@@ -6,6 +6,7 @@ import { DeleteOutlined, LoadingOutlined, FileOutlined } from '@ant-design/icons
 import { last } from "lodash";
 
 type UploadStatus = 'ready' | 'success' | 'error' | 'loading'
+type CheckUpload = (file: File) => boolean | Promise<File>
 interface UploadFile {
   uid: string;
   raw: File;
@@ -21,6 +22,9 @@ export default defineComponent({
     action: {
       type: String,
       required: true
+    },
+    beforeUpload: {
+      type: Function as PropType<CheckUpload>
     }
   },
   components: {
@@ -54,41 +58,59 @@ export default defineComponent({
       uploadedFiles.value = uploadedFiles.value.filter(item => item.uid !== id)
     }
 
+    const postFile = (uploadedFile: File) => {
+      const formData = new FormData()
+      const fileObj = reactive<UploadFile>({
+        uid: v4(),
+        size: uploadedFile.size,
+        name: uploadedFile.name,
+        status: 'loading',
+        raw: uploadedFile
+      })
+      uploadedFiles.value.push(fileObj)
+      formData.append(uploadedFile.name, uploadedFile)
+
+      axios.post(props.action, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then(resp => {
+        if (resp.data.errorData) {
+          fileObj.status = 'error'
+        }
+        else {
+          fileObj.status = 'success'
+          fileObj.resp = resp.data
+        }
+      }).catch(() => {
+        fileObj.status = 'error'
+      }).finally(() => {
+        if (fileInput.value) {
+          fileInput.value.value = ''
+        }
+      })
+    }
+
     const handleChangeFiles = (e: Event) => {
       const target = e.target as HTMLInputElement
       const files = target.files
       if (files) {
         const uploadedFile = files[0]
-        const formData = new FormData()
-        const fileObj = reactive<UploadFile>({
-          uid: v4(),
-          size: uploadedFile.size,
-          name: uploadedFile.name,
-          status: 'loading',
-          raw: uploadedFile
-        })
-        uploadedFiles.value.push(fileObj)
-        formData.append(uploadedFile.name, uploadedFile)
-
-        axios.post(props.action, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
+        if (props.beforeUpload) {
+          const result = props.beforeUpload(uploadedFile)
+          if (result && result instanceof Promise) {
+            result.then((file) => {
+              if (file instanceof File) postFile(file)
+              else throw new Error('beforeUpload Promise should return File object') 
+            }).catch(e => {
+              console.error(e)
+            })
+          } else if (result === true) {
+            postFile(uploadedFile)
           }
-        }).then(resp => {
-          if (resp.data.errorData) {
-            fileObj.status = 'error'
-          }
-          else {
-            fileObj.status = 'success'
-            fileObj.resp = resp.data
-          }
-        }).catch(() => {
-          fileObj.status = 'error'
-        }).finally(() => {
-          if (fileInput.value) {
-            fileInput.value.value = ''
-          }
-        })
+        } else {
+          postFile(uploadedFile)
+        }
       }
     }
 

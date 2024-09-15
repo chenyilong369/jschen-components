@@ -63,7 +63,7 @@ describe('Uploader Component', () => {
   it('should return error when error', async () => {
     mockedAxios.post.mockResolvedValueOnce(Promise.resolve().catch(e => ({error: 'error'})))
     await wrapper.get('input').trigger('change')
-    expect(mockedAxios.post).toHaveBeenCalledTimes(2)
+    expect(mockedAxios.post).toHaveBeenCalledTimes(1)
     expect(wrapper.get('button').text()).toBe('正在上传')
     await flushPromises()
     expect(wrapper.get('button').text()).toBe('点击上传')
@@ -105,5 +105,78 @@ describe('Uploader Component', () => {
     expect(wrapper.get('.loading').text()).toBe('loading slot')
     await flushPromises()
     expect(wrapper.get('.custom-loaded').text()).toBe('test2.url')
+  })
+
+  it('before upload check', async () => {
+    const callback = jest.fn()
+    mockedAxios.post.mockResolvedValueOnce(Promise.resolve().then(() =>({data: {url: 'test.url'}})))
+    const checkFileSize = (file: File) => {
+      if (file.size > 2) {
+        callback()
+        return false
+      }
+      return true
+    }
+    const wrapper = shallowMount(Uploader, {
+      props: {
+        action: 'test.url',
+        beforeUpload: checkFileSize
+      }
+    }) 
+    const fileInput = wrapper.get('input').element as HTMLInputElement
+    setInputValue(fileInput)
+    await wrapper.get('input').trigger('change')
+    expect(mockedAxios.post).not.toHaveBeenCalled()
+    expect(wrapper.findAll('li').length).toBe(0)
+    expect(callback).toHaveBeenCalled()
+  })
+  
+  it('before upload chack promise', async () => {
+    mockedAxios.post.mockResolvedValueOnce(Promise.resolve().then(() =>({data: {url: 'test.url'}})))
+    const failPromise = (file: File) => {
+      return Promise.reject('wrong')
+    }
+    const successPromise = (file: File) => {
+      const newFile = new File([file], 'abc.docx', {type: file.type})
+      return Promise.resolve(newFile)
+    }
+    const successPromiseWithWrongType = (file: File) => {
+      return Promise.resolve('abc.docx' as unknown as File)
+    }
+    const wrapper = shallowMount(Uploader, {
+      props: {
+        action: 'test.url',
+        beforeUpload: failPromise
+      }
+    })
+    const fileInput = wrapper.get('input').element as HTMLInputElement
+    setInputValue(fileInput)
+    await wrapper.get('input').trigger('change')
+    await flushPromises()
+    expect(mockedAxios.post).not.toHaveBeenCalled()
+    expect(wrapper.findAll('li').length).toBe(0)
+
+    await wrapper.setProps({
+      beforeUpload: successPromiseWithWrongType
+    })
+    await wrapper.get('input').trigger('change')
+    await flushPromises()
+    expect(mockedAxios.post).not.toHaveBeenCalled()
+    expect(wrapper.findAll('li').length).toBe(0)
+
+    await wrapper.setProps({
+      beforeUpload: successPromise
+    })
+    await wrapper.get('input').trigger('change')
+    await flushPromises()
+    expect(mockedAxios.post).toHaveBeenCalled()
+    const firstItem = wrapper.get('li:first-child')
+    expect(firstItem.classes()).toContain('upload-success')
+    expect(wrapper.get('.filename').text()).toBe('abc.docx')
+
+  })
+
+  afterEach(() => {
+    mockedAxios.post.mockReset()
   })
 })
