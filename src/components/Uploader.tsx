@@ -25,6 +25,18 @@ export default defineComponent({
     },
     beforeUpload: {
       type: Function as PropType<CheckUpload>
+    },
+    onProgress: {
+      type: Function
+    },
+    onSuccess: {
+      type: Function
+    },
+    onError: {
+      type: Function
+    },
+    onChange: {
+      type: Function
     }
   },
   components: {
@@ -35,6 +47,7 @@ export default defineComponent({
   setup(props, { slots }) {
     const fileInput = ref<null | HTMLInputElement>(null)
     const uploadedFiles = ref<UploadFile[]>([])
+    const progressNumber = ref(0)
     const isUploading = computed(() => {
       return uploadedFiles.value.some(item => item.status === 'loading')
     })
@@ -73,12 +86,20 @@ export default defineComponent({
       axios.post(props.action, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
+        },
+        onUploadProgress: (progressEvent: ProgressEvent) => {
+          progressNumber.value = Number((progressEvent.loaded / progressEvent.total).toFixed(1))
+          if (props.onProgress) {
+            props.onProgress(progressEvent)
+          }
         }
-      }).then(resp => {
+      },).then(resp => {
         if (resp.data.errorData) {
           fileObj.status = 'error'
+          props.onError && props.onError(resp.data.errorData)
         }
         else {
+          props.onSuccess && props.onSuccess(resp.data)
           fileObj.status = 'success'
           fileObj.resp = resp.data
         }
@@ -94,6 +115,7 @@ export default defineComponent({
     const handleChangeFiles = (e: Event) => {
       const target = e.target as HTMLInputElement
       const files = target.files
+      props.onChange && props.onChange(files)
       if (files) {
         const uploadedFile = files[0]
         if (props.beforeUpload) {
@@ -101,7 +123,7 @@ export default defineComponent({
           if (result && result instanceof Promise) {
             result.then((file) => {
               if (file instanceof File) postFile(file)
-              else throw new Error('beforeUpload Promise should return File object') 
+              else throw new Error('beforeUpload Promise should return File object')
             }).catch(e => {
               console.error(e)
             })
@@ -114,22 +136,25 @@ export default defineComponent({
       }
     }
 
+    const getUploaderButton = () => {
+      if (isUploading.value) {
+        return slots.loading ? slots.loading({
+          loadedPresent: progressNumber.value
+        }) : <button disabled>正在上传, 当前进度: {progressNumber.value}%</button>
+      } else if (lastFileData.value && lastFileData.value.loaded) {
+        return slots.uploaded ? slots.uploaded({
+          uploadedData: lastFileData.value.data
+        },) : <button>点击上传</button>
+      } else {
+        return slots.default ? slots.default() : <button>点击上传</button>
+      }
+    }
 
     return () => (
       <div class="file-upload">
         <div onClick={triggerUpload}>
           {
-            (() => {
-              if (isUploading.value) {
-                return slots.loading ? slots.loading() : <button disabled>正在上传</button>
-              } else if (lastFileData.value && lastFileData.value.loaded) {
-                return slots.uploaded ? slots.uploaded({
-                  uploadedData: lastFileData.value.data
-                },) : <button>点击上传</button>
-              } else {
-                return slots.default ? slots.default() : <button>点击上传</button>
-              }
-            })()
+            getUploaderButton()
           }
         </div>
         <input ref={fileInput} onChange={(e) => handleChangeFiles(e)} type="file" style={{ display: 'none' }} />
