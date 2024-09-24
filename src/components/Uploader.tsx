@@ -37,6 +37,10 @@ export default defineComponent({
     },
     onChange: {
       type: Function
+    },
+    drag: {
+      type: Boolean,
+      default: false
     }
   },
   components: {
@@ -47,6 +51,7 @@ export default defineComponent({
   setup(props, { slots }) {
     const fileInput = ref<null | HTMLInputElement>(null)
     const uploadedFiles = ref<UploadFile[]>([])
+    const isDragOver = ref(false)
     const progressNumber = ref(0)
     const isUploading = computed(() => {
       return uploadedFiles.value.some(item => item.status === 'loading')
@@ -112,9 +117,7 @@ export default defineComponent({
       })
     }
 
-    const handleChangeFiles = (e: Event) => {
-      const target = e.target as HTMLInputElement
-      const files = target.files
+    const uploadFiles = (files: null | FileList) => {
       props.onChange && props.onChange(files)
       if (files) {
         const uploadedFile = files[0]
@@ -136,6 +139,24 @@ export default defineComponent({
       }
     }
 
+    const handleDrag = (e: DragEvent, over: boolean) => {
+      e.preventDefault()
+      isDragOver.value = over
+    }
+
+    const handleDrop = (e: DragEvent) => {
+      e.preventDefault()
+      isDragOver.value = false
+      if (e.dataTransfer) {
+        uploadFiles(e.dataTransfer.files)
+      }
+    }
+
+    const handleChangeFiles = (e: Event) => {
+      const target = e.target as HTMLInputElement
+      uploadFiles(target.files)
+    }
+
     const getUploaderButton = () => {
       if (isUploading.value) {
         return slots.loading ? slots.loading({
@@ -150,9 +171,21 @@ export default defineComponent({
       }
     }
 
+    let events: { [key: string]: (e: any) => void } = {
+      'onClick': triggerUpload
+    }
+    if (props.drag) {
+      events = {
+        ...events,
+        'onDragover': (e: DragEvent) => { handleDrag(e, true) },
+        'onDragleave': (e: DragEvent) => { handleDrag(e, false) },
+        'onDrop': handleDrop
+      }
+    }
+
     return () => (
       <div class="file-upload">
-        <div onClick={triggerUpload}>
+        <div onClick={triggerUpload} class={{ "upload-area": true, "is-dragover": props.drag && isDragOver.value }} {...events}>
           {
             getUploaderButton()
           }
