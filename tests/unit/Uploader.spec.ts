@@ -176,6 +176,25 @@ describe('Uploader Component', () => {
 
   })
 
+  it('test drag and drop', async () => {
+    mockedAxios.post.mockResolvedValueOnce(Promise.resolve().then(() =>({data: {url: 'test.url'}})))
+    const wrapper = shallowMount(Uploader, {
+      props: {
+        action: 'test.url',
+        drag: true
+      }
+    })
+    const uploadArea = wrapper.get('.upload-area')
+    await uploadArea.trigger('dragover')
+    expect(uploadArea.classes()).toContain('is-dragover')
+    await uploadArea.trigger('dragleave')
+    expect(uploadArea.classes()).not.toContain('is-dragover')
+    await uploadArea.trigger('drop',{ dataTransfer: {files: [testFile]} })
+    expect(mockedAxios.post).toHaveBeenCalled()
+    await flushPromises()
+    expect(wrapper.findAll('li').length).toBe(1)
+  })
+
   afterEach(() => {
     mockedAxios.post.mockReset()
   })

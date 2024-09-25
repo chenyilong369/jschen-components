@@ -161,7 +161,7 @@ export default defineComponent({
       if (isUploading.value) {
         return slots.loading ? slots.loading({
           loadedPresent: progressNumber.value
-        }) : <button disabled>正在上传, 当前进度: {progressNumber.value}%</button>
+        }) : <button disabled>正在上传</button>
       } else if (lastFileData.value && lastFileData.value.loaded) {
         return slots.uploaded ? slots.uploaded({
           uploadedData: lastFileData.value.data
