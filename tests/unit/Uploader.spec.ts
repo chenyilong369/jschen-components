@@ -195,6 +195,27 @@ describe('Uploader Component', () => {
     expect(wrapper.findAll('li').length).toBe(1)
   })
 
+  it.only('testing manual upload process', async () => {
+    mockedAxios.post.mockResolvedValueOnce(Promise.resolve().then(() => ({data: {url: "123.sss"}})))
+    const wrapper = shallowMount(Uploader, {
+      props: {
+        action: 'test.url',
+        drag: true,
+        autoUpload: false
+      }
+    })
+    const fileInput = wrapper.get('input').element as HTMLInputElement
+    setInputValue(fileInput)
+    await wrapper.get('input').trigger('change')
+    expect(wrapper.findAll('li').length).toBe(1)
+    const firstItem = wrapper.get('li:first-child')
+    expect(firstItem.classes()).toContain('upload-ready')
+    console.log(wrapper.vm.$, 12)
+    expect(mockedAxios.post).toHaveBeenCalled()
+    await flushPromises()
+    expect(firstItem.classes()).toContain('upload-success')
+  })
+
   afterEach(() => {
     mockedAxios.post.mockReset()
   })
