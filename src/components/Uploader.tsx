@@ -111,6 +111,7 @@ export default defineComponent({
           props.onError && props.onError(resp.data.errorData)
         }
         else {
+          console.log(resp.data)
           props.onSuccess && props.onSuccess(resp.data)
           readyFile.status = 'success'
           readyFile.resp = resp.data

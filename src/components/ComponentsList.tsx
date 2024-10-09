@@ -19,9 +19,9 @@ export default defineComponent({
     const onItemClick = (data: any) => {
       context.emit("itemClick", data)
     };
-    const onImageUploaded = (data: { resp: any; file: File }) => {
-      const { resp, file } = data
-      console.log(resp, file)
+    const onImageUploaded = (data: { resp: any }) => {
+      const { resp } = data
+      console.log(resp)
       message.success('上传成功')
     }
     return () => (

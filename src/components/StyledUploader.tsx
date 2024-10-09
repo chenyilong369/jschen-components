@@ -22,15 +22,16 @@ export default defineComponent({
   },
   emits: ['success'],
   setup(props, { emit }) {
-    const handleUploadSuccess = (resp: any, file: File) => {
-      emit('success', { resp, file })
+    const handleUploadSuccess = (resp: any) => {
+      emit('success', { resp })
     }
     return () => (
       <Uploader
         action="http://127.0.0.1:7001/cos"
+        class="styled-uploader"
         showUploadList={false}
         beforeUpload={commonUploadCheck}
-        onSuccess={(data: { resp: any; file: { raw: File } }) => handleUploadSuccess(data.resp, data.file.raw)}
+        onSuccess={(data: { resp: any }) => handleUploadSuccess(data)}
       >
         {
           {
