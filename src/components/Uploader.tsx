@@ -186,29 +186,42 @@ export default defineComponent({
       }
     }
 
-    let events: { [key: string]: (e: any) => void } = {
-      'onClick': triggerUpload
+    return {
+      triggerUpload,
+      getUploaderButton,
+      isDragOver,
+      handleDrag,
+      handleDrop,
+      handleChangeFiles,
+      fileInput,
+      uploadFiles,
+      filesList,
+      removeFile
     }
-    if (props.drag) {
+  },
+  render() {
+    let events: { [key: string]: (e: any) => void } = {
+      'onClick': this.triggerUpload
+    }
+    if (this.$props.drag) {
       events = {
         ...events,
-        'onDragover': (e: DragEvent) => { handleDrag(e, true) },
-        'onDragleave': (e: DragEvent) => { handleDrag(e, false) },
-        'onDrop': handleDrop
+        'onDragover': (e: DragEvent) => { this.handleDrag(e, true) },
+        'onDragleave': (e: DragEvent) => { this.handleDrag(e, false) },
+        'onDrop': this.handleDrop
       }
     }
-
-    return () => (
+    return (
       <div class="file-upload">
-        <div onClick={triggerUpload} class={{ "upload-area": true, "is-dragover": props.drag && isDragOver.value }} {...events}>
+        <div onClick={this.triggerUpload} class={{ "upload-area": true, "is-dragover": this.$props.drag && this.isDragOver }} {...events}>
           {
-            getUploaderButton()
+            this.getUploaderButton()
           }
         </div>
-        <input ref={fileInput} onChange={(e) => handleChangeFiles(e)} type="file" style={{ display: 'none' }} />
+        <input ref={ref(this.fileInput)} onChange={(e) => this.handleChangeFiles(e)} type="file" style={{ display: 'none' }} />
         <ul class="upload-list">
           {
-            filesList.value.map((file) => {
+            this.filesList.map((file) => {
               return (
                 <li class={`uploaded-file upload-${file.status}`} key={file.uid}>
                   <span class="file-icon">
@@ -217,7 +230,7 @@ export default defineComponent({
                     }
                   </span>
                   <span class="filename">{file.name}</span>
-                  <span class="delete-icon" onClick={() => removeFile(file.uid)}><DeleteOutlined /></span>
+                  <span class="delete-icon" onClick={() => this.removeFile(file.uid)}><DeleteOutlined /></span>
                 </li>
               )
             })

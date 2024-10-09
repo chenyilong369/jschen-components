@@ -210,7 +210,7 @@ describe('Uploader Component', () => {
     expect(wrapper.findAll('li').length).toBe(1)
     const firstItem = wrapper.get('li:first-child')
     expect(firstItem.classes()).toContain('upload-ready')
-    console.log(wrapper.vm.$, 12)
+    wrapper.vm.uploadFiles();
     expect(mockedAxios.post).toHaveBeenCalled()
     await flushPromises()
     expect(firstItem.classes()).toContain('upload-success')
