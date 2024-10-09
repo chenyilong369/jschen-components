@@ -195,7 +195,7 @@ describe('Uploader Component', () => {
     expect(wrapper.findAll('li').length).toBe(1)
   })
 
-  it.only('testing manual upload process', async () => {
+  it('testing manual upload process', async () => {
     mockedAxios.post.mockResolvedValueOnce(Promise.resolve().then(() => ({data: {url: "123.sss"}})))
     const wrapper = shallowMount(Uploader, {
       props: {
@@ -214,6 +214,28 @@ describe('Uploader Component', () => {
     expect(mockedAxios.post).toHaveBeenCalled()
     await flushPromises()
     expect(firstItem.classes()).toContain('upload-success')
+  })
+
+  it('PictureList mode should work fine', async () => {
+    mockedAxios.post.mockResolvedValueOnce(Promise.resolve().then(() => ({data: {url: "123.sss"}})))
+    window.URL.createObjectURL = jest.fn(() => {
+      return 'test.url'
+    })
+    const wrapper = mount(Uploader, {
+      props: {
+        action: "test.url",
+        listType: "picture"
+      }
+    })
+    expect(wrapper.get('ul').classes()).toContain('upload-list-picture')
+    const fileInput = wrapper.get('input').element as HTMLInputElement
+    setInputValue(fileInput)
+    await wrapper.get('input').trigger('change')
+    await flushPromises()
+    expect(wrapper.findAll('li').length).toBe(1)
+    expect(wrapper.find('li:first-child img').exists()).toBeTruthy()
+    const firstItem = wrapper.get('li:first-child img')
+    expect(firstItem.attributes('src')).toEqual('test.url')
   })
 
   afterEach(() => {

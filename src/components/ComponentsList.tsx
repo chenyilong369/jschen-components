@@ -1,5 +1,7 @@
 import { defineComponent } from 'vue'
 import LText from './LText'
+import StyledUploader from './StyledUploader'
+import { message } from 'ant-design-vue';
 export default defineComponent({
   props: {
     list: {
@@ -10,22 +12,29 @@ export default defineComponent({
   emits: ['itemClick'],
   name: 'components-list',
   components: {
-    LText
+    LText,
+    StyledUploader
   },
   setup(props, context) {
     const onItemClick = (data: any) => {
       context.emit("itemClick", data)
     };
+    const onImageUploaded = (data: { resp: any; file: File }) => {
+      const { resp, file } = data
+      console.log(resp, file)
+      message.success('上传成功')
+    }
     return () => (
       <div class="create-component-list">
-      {
-        props.list.map((item: any, index) => (
-          <div key={index} onClick={() => onItemClick(item)} class="component-wrapper">
-            <LText {...item}></LText>
-          </div>
-        )) 
-      }
-    </div>
+        {
+          props.list.map((item: any, index) => (
+            <div key={index} onClick={() => onItemClick(item)} class="component-wrapper">
+              <LText {...item}></LText>
+            </div>
+          ))
+        }
+          <StyledUploader onSuccess={onImageUploaded}></StyledUploader>
+      </div>
     )
   }
 })

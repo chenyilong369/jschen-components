@@ -6,6 +6,7 @@ import { DeleteOutlined, LoadingOutlined, FileOutlined } from '@ant-design/icons
 import { last } from "lodash";
 
 type UploadStatus = 'ready' | 'success' | 'error' | 'loading'
+type FileListType = 'picture' | 'text'
 type CheckUpload = (file: File) => boolean | Promise<File>
 interface UploadFile {
   uid: string;
@@ -14,6 +15,7 @@ interface UploadFile {
   name: string;
   status: UploadStatus;
   resp?: any;
+  url?: string;
 }
 
 export default defineComponent({
@@ -43,6 +45,14 @@ export default defineComponent({
       default: false
     },
     autoUpload: {
+      type: Boolean,
+      default: true
+    },
+    listType: {
+      type: String as PropType<FileListType>,
+      default: 'picture'
+    },
+    showUploadList: {
       type: Boolean,
       default: true
     }
@@ -126,6 +136,18 @@ export default defineComponent({
         status: 'ready',
         raw: uploadedFile
       })
+      if (props.listType === 'picture') {
+        try {
+          fileObj.url = URL.createObjectURL(uploadedFile)
+        } catch (e) {
+          console.error('upload File error!', e)
+        }
+        // const fileReader = new FileReader()
+        // fileReader.readAsDataURL(uploadedFile)
+        // fileReader.addEventListener('load', () => {
+        //   fileObj.url = fileReader.result as string
+        // })
+      }
       filesList.value.push(fileObj)
       if (props.autoUpload) {
         postFile(fileObj)
@@ -218,24 +240,37 @@ export default defineComponent({
             this.getUploaderButton()
           }
         </div>
-        <input ref={ref(this.fileInput)} onChange={(e) => this.handleChangeFiles(e)} type="file" style={{ display: 'none' }} />
-        <ul class="upload-list">
-          {
-            this.filesList.map((file) => {
-              return (
-                <li class={`uploaded-file upload-${file.status}`} key={file.uid}>
-                  <span class="file-icon">
-                    {
-                      file.status === 'loading' ? <LoadingOutlined /> : <FileOutlined />
-                    }
-                  </span>
-                  <span class="filename">{file.name}</span>
-                  <span class="delete-icon" onClick={() => this.removeFile(file.uid)}><DeleteOutlined /></span>
-                </li>
-              )
-            })
-          }
-        </ul>
+        <input ref="fileInput" onChange={(e) => this.handleChangeFiles(e)} type="file" style={{ display: 'none' }} />
+        {
+          this.$props.showUploadList ? (
+            <ul class={`upload-list upload-list-${this.listType}`}>
+              {
+                this.filesList.map((file) => {
+                  return (
+                    <li class={`uploaded-file upload-${file.status}`} key={file.uid}>
+                      {
+                        file.url && this.listType === 'picture' ? (
+                          <img
+                            class="upload-list-thumbnail"
+                            src={file.url}
+                            alt={file.name}
+                          />
+                        ) : ''
+                      }
+                      <span class="file-icon">
+                        {
+                          file.status === 'loading' ? <LoadingOutlined /> : <FileOutlined />
+                        }
+                      </span>
+                      <span class="filename">{file.name}</span>
+                      <span class="delete-icon" onClick={() => this.removeFile(file.uid)}><DeleteOutlined /></span>
+                    </li>
+                  )
+                })
+              }
+            </ul>
+          ) : ''
+        }
       </div>
     )
   }
