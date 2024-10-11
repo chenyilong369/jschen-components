@@ -3,6 +3,7 @@ import store from "@/store";
 import { ComponentData, testComponents } from "@/store/editor";
 import { testData } from "@/store/templates";
 import { clone, last } from "lodash";
+import { v4 } from "uuid";
 const cloneComponents = clone(testComponents)
 
 describe('test vuex', () => {
@@ -48,7 +49,12 @@ describe('test vuex', () => {
       const payload: Partial<TextComponentProps> ={
         text: 'text1'
       }
-      store.commit('addComponent', payload)
+      const newComponent: ComponentData = {
+        id: v4(),
+        name: 'l-text',
+        props: payload
+      }
+      store.commit('addComponent', newComponent)
       expect(store.state.editor.components).toHaveLength(cloneComponents.length + 1)
       const lastItem = last(store.state.editor.components)
       expect(lastItem?.props.text).toBe('text1')

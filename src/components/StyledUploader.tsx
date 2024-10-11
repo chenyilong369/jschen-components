@@ -22,7 +22,7 @@ export default defineComponent({
   },
   emits: ['success'],
   setup(props, { emit }) {
-    const handleUploadSuccess = (resp: any) => {
+    const handleUploadSuccess: any = (resp: any) => {
       emit('success', { resp })
     }
     return () => (

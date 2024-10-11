@@ -2,6 +2,11 @@ import { defineComponent } from 'vue'
 import LText from './LText'
 import StyledUploader from './StyledUploader'
 import { message } from 'ant-design-vue';
+import { v4 } from 'uuid';
+import { ComponentData } from '@/store/editor';
+import { UploadResp } from '@/extraType';
+import { imageDefaultProps } from '@/defaultProps';
+import { getImageDimensions } from '@/utils/helper';
 export default defineComponent({
   props: {
     list: {
@@ -9,7 +14,7 @@ export default defineComponent({
       required: true
     }
   },
-  emits: ['itemClick'],
+  emits: ['itemCreate'],
   name: 'components-list',
   components: {
     LText,
@@ -17,12 +22,31 @@ export default defineComponent({
   },
   setup(props, context) {
     const onItemClick = (data: any) => {
-      context.emit("itemClick", data)
+      const newComponent: ComponentData = {
+        id: v4(),
+        name: 'l-text',
+        props: data
+      }
+      context.emit("itemCreate", newComponent)
     };
-    const onImageUploaded = (data: { resp: any }) => {
+    const onImageUploaded = (data: UploadResp) => {
+      console.log(data)
       const { resp } = data
-      console.log(resp)
+      const newComponent: ComponentData = {
+        id: v4(),
+        name: 'l-image',
+        props: {
+          ...imageDefaultProps
+        }
+      }
       message.success('上传成功')
+      newComponent.props.src = 'https://' + resp.successData.Location
+      getImageDimensions(resp?.raw).then(({ width }) => {
+        console.log(width)
+        const maxWidth = 317
+        newComponent.props.width = Math.min(maxWidth, width).toString()
+        context.emit("itemCreate", newComponent)
+      })
     }
     return () => (
       <div class="create-component-list">
@@ -33,7 +57,7 @@ export default defineComponent({
             </div>
           ))
         }
-          <StyledUploader onSuccess={onImageUploaded}></StyledUploader>
+        <StyledUploader onSuccess={onImageUploaded}></StyledUploader>
       </div>
     )
   }

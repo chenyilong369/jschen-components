@@ -5,14 +5,17 @@ import defaultTextTemplates from '../defaultTemplates'
 import { useStore } from 'vuex'
 import '@/styles/Editor.scss'
 import LText from '../components/LText'
+import LImage from '@/components/LImage';
 import { GlobalDataProps } from '../store/index'
 import { ComponentData } from '../store/editor'
+import { AllComponentProps } from '@/defaultProps';
 import PropsTable from '@/components/PropsTable';
 export default defineComponent({
   name: 'Editor',
   components: {
     LText,
     PropsTable,
+    LImage,
     ComponentsList,
     EditWrapper
   },
@@ -21,8 +24,8 @@ export default defineComponent({
     const components = computed(() => store.state.editor.components)
     const componentList = computed(() => defaultTextTemplates)
     const currentElement = computed<ComponentData | null>(() => store.getters.getCurrentElement)
-    const addItem = (props: any) => {
-      store.commit('addComponent', props)
+    const addItem = (component: ComponentData) => {
+      store.commit('addComponent', component)
     }
     const setActive = (id: string) => {
       store.commit('setActive', id)
@@ -38,7 +41,7 @@ export default defineComponent({
         <a-row class="content-row">
           <a-col flex="1" class="left">
             <div>组件列表 </div>
-            <ComponentsList list={componentList.value} onItemClick={addItem} />
+            <ComponentsList list={componentList.value} onItemCreate={addItem} />
           </a-col>
           <a-col flex="2" class="middle">
             <div class="middle-title">
@@ -48,16 +51,18 @@ export default defineComponent({
               {
                 components.value?.map(item => (
                   <EditWrapper
-                    key={item.id} 
-                    id={item.id} 
+                    key={item.id}
+                    id={item.id}
                     onSetActive={setActive}
                     active={item.id === (currentElement.value && currentElement.value.id)}
                   >
-                    {{ default: () => (
-                      <>
-                        {h(resolveComponent(item.name), {...item.props})}
-                      </>
-                    )}}
+                    {{
+                      default: () => (
+                        <>
+                          {h(resolveComponent(item.name), { ...item.props })}
+                        </>
+                      )
+                    }}
                   </EditWrapper>))
               }
             </div>
@@ -66,15 +71,15 @@ export default defineComponent({
             {
               currentElement.value?.props ? <PropsTable props={currentElement.value.props} onChange={handleChange} /> : ''
             }
-            {  currentElement.value ? <a-button type="primary" onClick={deleteComponent}>删除组件</a-button> : ''}
+            {currentElement.value ? <a-button type="primary" onClick={deleteComponent}>删除组件</a-button> : ''}
             <pre>
-              { Object.keys(currentElement.value?.props || {}).map(item => {
+              {Object.keys(currentElement.value?.props || {}).map((item) => {
                 return (
                   <div>
-                    {item}: {currentElement.value?.props[item]}
+                    {item}: {currentElement.value?.props[item as keyof AllComponentProps]}
                   </div>
                 )
-              }) }
+              })}
             </pre>
           </a-col>
         </a-row>

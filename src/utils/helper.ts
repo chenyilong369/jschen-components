@@ -5,7 +5,7 @@ interface CheckCondition {
   size?: number;
 }
 type ErrorType = 'size' | 'format' | null
-export function beforeUploadCheck (file: File, condition: CheckCondition) {
+export function beforeUploadCheck(file: File, condition: CheckCondition) {
   const { format, size } = condition
   const isValidFormat = format ? format.includes(file.type) : true
   const isValidSize = size ? (file.size / 1024 / 1024 < size) : true
@@ -32,4 +32,18 @@ export const commonUploadCheck = (file: File) => {
     message.error('上传图片大小不能超过 1Mb')
   }
   return passed
+}
+
+export const getImageDimensions = (url: string | File) => {
+  return new Promise<{ width: number; height: number }>((resolve, reject) => {
+    const img = new Image()
+    img.src = typeof url === 'string' ? url : URL.createObjectURL(url)
+    img.addEventListener('load', () => {
+      const { naturalWidth: width, naturalHeight: height } = img
+      resolve({ width, height })
+    })
+    img.addEventListener('error', () => {
+      reject(new Error('There has some problem with the image'))
+    })
+  })
 }

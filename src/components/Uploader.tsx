@@ -112,6 +112,7 @@ export default defineComponent({
         }
         else {
           console.log(resp.data)
+          resp.data.raw = readyFile.raw
           props.onSuccess && props.onSuccess(resp.data)
           readyFile.status = 'success'
           readyFile.resp = resp.data

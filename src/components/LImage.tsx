@@ -1,7 +1,7 @@
-import { imageDefaultProps, transformToComponentProps } from "@/defaultProps";
+import { imageDefaultProps, imageStylePropsNames, transformToComponentProps } from "@/defaultProps";
 import useComponentCommon from "@/hooks/useComponentCommon";
-import { defineComponent } from "vue";
-
+import { CSSProperties, defineComponent, withModifiers } from "vue";
+import '@/styles/components/LImage.scss'
 const defaultProps = transformToComponentProps(imageDefaultProps)
 
 export default defineComponent({
@@ -10,6 +10,14 @@ export default defineComponent({
     ...defaultProps
   },
   setup(props) {
-    const {} = useComponentCommon(props, )
+    const { styleProps, handleClick } = useComponentCommon(props, imageStylePropsNames)
+    return () => (
+      <img
+        style={styleProps.value as CSSProperties}
+        class="l-image-component"
+        src={props.src}
+        onClick={withModifiers(handleClick, ['prevent'])}
+      />
+    )
   }
 })
