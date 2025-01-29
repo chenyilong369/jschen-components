@@ -23,11 +23,12 @@ export default defineComponent({
   emits: ['success'],
   setup(props, { emit }) {
     const handleUploadSuccess: any = (resp: any) => {
+      console.log(resp)
       emit('success', { resp })
     }
     return () => (
       <Uploader
-        action="http://127.0.0.1:7001/cos"
+        action="http://127.0.0.1:3000/api/utils/updateToCos"
         class="styled-uploader"
         showUploadList={false}
         beforeUpload={commonUploadCheck}

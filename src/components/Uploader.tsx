@@ -106,12 +106,12 @@ export default defineComponent({
           }
         }
       },).then(resp => {
-        if (resp.data.errorData) {
+        if (resp.data.errno) {
           readyFile.status = 'error'
-          props.onError && props.onError(resp.data.errorData)
+          props.onError && props.onError(resp.data?.data?.errorData)
         }
         else {
-          console.log(resp.data)
+          resp.data.successData = resp.data?.data
           resp.data.raw = readyFile.raw
           props.onSuccess && props.onSuccess(resp.data)
           readyFile.status = 'success'
