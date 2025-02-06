@@ -40,7 +40,8 @@ export interface TextComponentProps extends CommonComponentProps {
 
 export type AllComponentProps = TextComponentProps & ImageComponentProps
 
-export interface ImageComponentProps extends CommonComponentProps {
+export interface ImageComponentProps {
+  width: string;
   src: string;
 }
 
@@ -90,7 +91,7 @@ export const textDefaultProps: TextComponentProps = {
 
 export const imageDefaultProps: ImageComponentProps = {
   src: 'test.url',
-  ...commonDefaultProps
+  width: '100px'
 }
 
 export const textStylePropsName = without(Object.keys(textDefaultProps), 'text', 'actionType', 'url')

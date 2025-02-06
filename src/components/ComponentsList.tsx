@@ -40,11 +40,10 @@ export default defineComponent({
         }
       }
       message.success('上传成功')
-      newComponent.props.src = 'https://' + resp.successData.Location
+      newComponent.props.src = resp.successData.url
       getImageDimensions(resp?.raw).then(({ width }) => {
-        console.log(width)
         const maxWidth = 317
-        newComponent.props.width = Math.min(maxWidth, width).toString()
+        newComponent.props.width = Math.min(maxWidth, width).toString() + 'px'
         context.emit("itemCreate", newComponent)
       })
     }

@@ -48,10 +48,10 @@ export default defineComponent({
                 <h4>{props.text}</h4>
               </div>
             ),
-            uploaded: (dataProps: { successData: { Location: string } }) => (
+            uploaded: (dataProps: { successData: { url: string } }) => (
               <div class="uploader-container">
                 {
-                  props.showUploaded ? <img src={'https://' + dataProps.successData.Location} /> : (
+                  props.showUploaded ? <img src={ dataProps.successData.url } /> : (
                     <>
                       <FileImageOutlined />
                       <h4>{props.text}</h4>

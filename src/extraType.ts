@@ -3,7 +3,7 @@ export interface UploadResp {
     message: string;
     raw: File;
     successData: {
-      Location: string;
+      url: string;
       statusCode: number;
     };
   };

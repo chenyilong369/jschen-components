@@ -27,6 +27,37 @@ export const testComponents = [
   { id: v4(), name: 'l-text', props: { text: 'hello3', fontSize: '36px', url: '', actionType: 'url', fontFamily: '' } }
 ]
 
+export interface PageProps {
+  backgroundColor: string;
+  backgroundImage: string;
+  backgroundRepeat: string;
+  backgroundSize: string;
+  height: string;
+}
+export type AllFormProps = PageProps & AllComponentProps
+
+export interface PageData {
+  id?: number;
+  props?: PageProps;
+  title?: string;
+  desc?: string;
+  coverImg?: string;
+  uuid?: string;
+  setting?: { [key: string]: any };
+  isTemplate?: boolean;
+  isHot?: boolean;
+  isNew?: boolean;
+  author?: string;
+  copiedCount?: number;
+  status?: number;
+  user? : {
+    gender: string;
+    nickName: string;
+    picture: string;
+    userName: string;
+  };
+}
+
 const editor: Module<EditorProps, GlobalDataProps> = {
   state: {
     components: testComponents,

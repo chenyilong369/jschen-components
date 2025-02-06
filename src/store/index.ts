@@ -9,6 +9,12 @@ export interface GlobalDataProps {
   editor: EditorProps;
 }
 
+export interface ActionPayload {
+  urlParams?: { [key: string]: any };
+  data?: any;
+  searchParams?: { [key: string]: any };
+}
+
 
 
 const store = createStore<GlobalDataProps>({

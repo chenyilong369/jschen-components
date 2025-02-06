@@ -1,5 +1,5 @@
 import { VNode, h } from "vue";
-import { TextComponentProps } from "./defaultProps";
+import { AllFormProps } from "./store/editor";
 
 export interface PropToForm {
   component: string;
@@ -14,7 +14,7 @@ export interface PropToForm {
 }
 
 export type PropToForms = {
-  [P in keyof TextComponentProps]? : PropToForm
+  [P in keyof AllFormProps]? : PropToForm
 }
 const fontFamilyArr = [
   { text: '宋体', value: '"SimSun","STSong"' },
@@ -59,6 +59,9 @@ export const mapPropsToForms: PropToForms = {
     },
     initalTransform: (v: string) => parseFloat(v),
     afterTransform: (e: number) => e.toString()
+  },
+  src: {
+    component: 'image-processer'
   },
   textAlign: {
     component: 'a-radio-group',
@@ -125,12 +128,12 @@ export const mapPropsToForms: PropToForms = {
   },
   opacity: {
     component: 'a-slider',
+    text: '透明度',
     initalTransform: (v: number) => v ? v * 100 : 100,
     afterTransform: (e: number) => (e / 100),
     extraProps: {
       min: 0,
       max: 100,
-      reverse: true
     } 
   },
   left: pxToNumberComponent('X轴坐标'),
