@@ -45,7 +45,10 @@ export default defineComponent({
         console.log(cropperImg.value)
         if (cropperImg.value) {
           cropper = new Cropper(cropperImg.value, {
+            aspectRatio: 16 / 9,
+            checkCrossOrigin: false,
             crop(event) {
+              console.log(event)
               const { x, y, width, height } = event.detail
               cropData = {
                 x: Math.floor(x),

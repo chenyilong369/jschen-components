@@ -14,9 +14,10 @@
 }
 
 .image-cropper {
-   img {
-    width: 100%
-   }
+    img {
+        display: block;
+        max-width: 100%;
+    }
 }
 
 .image-process {
@@ -26,9 +27,5 @@
     flex-direction: column;
     justify-content: space-between;
 
-    img {
-        display: block;
-        /* This rule is very important, please don't ignore this */
-        max-width: 100%;
-    }
+
 }
