@@ -45,7 +45,6 @@ export default defineComponent({
         console.log(cropperImg.value)
         if (cropperImg.value) {
           cropper = new Cropper(cropperImg.value, {
-            aspectRatio: 16 / 9,
             checkCrossOrigin: false,
             crop(event) {
               console.log(event)
@@ -55,7 +54,6 @@ export default defineComponent({
                 y: Math.floor(y),
                 width: Math.floor(width),
                 height: Math.floor(height)
-
               }
             }
           })
@@ -69,23 +67,7 @@ export default defineComponent({
     const handleOk = () => {
       if (cropData) {
         const { x, y, width, height } = cropData
-        const cropperURL = baseImageUrl.value + `?x-oss-process=image/crop,x_${x},y_${y},w_${width},h_${height}`
-        // 不使用 阿里云 OSS，拿到截图图片再次上传的处理方法
-        // 这里实现还是采用原方法，假如同学们愿意使用重新上传的方法的话，请看下面注释的代码
-        // cropper.getCroppedCanvas().toBlob((blob) => {
-        //   if (blob) {
-        //     const formData = new FormData()
-        //     formData.append('croppedImage', blob, 'test.png')
-        //     axios.post('http://local.test:7001/api/upload/', formData, {
-        //       headers: {
-        //         'Content-Type': 'multipart/form-data'
-        //       }
-        //     }).then(resp => {
-        //       context.emit('change', resp.data.data.url)
-        //       showModal.value = false
-        //     })
-        //   }
-        // })
+        const cropperURL = baseImageUrl.value + `?imageMogr2/cut/${width}x${height}x${x}x${y}`
         context.emit('change', cropperURL)
       }
       showModal.value = false
