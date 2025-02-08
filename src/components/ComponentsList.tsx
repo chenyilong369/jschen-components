@@ -30,8 +30,8 @@ export default defineComponent({
       context.emit("itemCreate", newComponent)
     };
     const onImageUploaded = (data: UploadResp) => {
-      console.log(data)
-      const { resp } = data
+      const copyData = {...data}
+      const { resp } = copyData
       const newComponent: ComponentData = {
         id: v4(),
         name: 'l-image',
@@ -51,7 +51,7 @@ export default defineComponent({
       <div class="create-component-list">
         {
           props.list.map((item: any, index) => (
-            <div key={index} onClick={() => onItemClick(item)} class="component-wrapper">
+            <div key={index} onClick={() => onItemClick({...item})} class="component-wrapper">
               <LText {...item}></LText>
             </div>
           ))
