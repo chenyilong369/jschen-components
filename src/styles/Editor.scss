@@ -1,35 +1,37 @@
-.edtior-content {
-  min-height: 92vh;
-
-  .content-row {
-    min-height: inherit;
-
-    .left {
-      background-color: yellow
-    }
-
-    .middle {
-      background-color: #ccc;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-
-      .middle-title {
-        margin-top: 70px;
-        font-size: 16px;
-      }
-
-      .draw {
-        margin-top: 50px;
-        width: 70%;
-        height: 200px;
-        position: relative;
-        background-color: #fff;
-      }
-    }
-
-    .right {
-    }
-  }
-
+.editor-container .preview-container {
+  padding: 24px;
+  margin: 0;
+  min-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+.editor-container .preview-list {
+  padding: 0;
+  margin: 0;
+  min-width: 375px;
+  min-height: 200px;
+  border: 1px solid #efefef;
+  background: #fff;
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: fixed;
+  margin-top: 50px;
+  max-height: 80vh;
+}
+.page-title {
+  display: flex;
+}
+.page-title .inline-edit span {
+  font-weight: 500;
+  margin-left: 10px;
+  font-size: 16px;
+}
+.preview-list.canvas-fix .edit-wrapper > * {
+  box-shadow: none !important;
+}
+.preview-list.canvas-fix {
+  position: absolute;
+  max-height: none;
 }
