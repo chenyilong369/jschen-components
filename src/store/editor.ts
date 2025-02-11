@@ -16,6 +16,9 @@ export interface UpdateComponentData {
 }
 
 export interface ComponentData {
+  layerName?: string;
+  isLocked?: boolean;
+  isHidden?: boolean;
   props: Partial<AllComponentProps>;
   id: string;
   name: string;
