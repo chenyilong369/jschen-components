@@ -2,7 +2,7 @@ import { defineComponent, computed, h, resolveComponent, ref } from 'vue'
 import EditWrapper from '../components/EditWrapper'
 import ComponentsList from '../components/ComponentsList';
 import defaultTextTemplates from '../defaultTemplates'
-// import LayerList from '../components/LayerList'
+import LayerList from '../components/LayerList'
 import { useStore } from 'vuex'
 import '@/styles/Editor.scss'
 import LText from '../components/LText'
@@ -118,6 +118,12 @@ export default defineComponent({
               </a-tab-pane>
 
               <a-tab-pane key="layer" tab="图层设置">
+                <LayerList
+                  list={components.value} 
+                  selectedId={currentElement.value ? currentElement.value?.id : ''} 
+                  onChange={handleChange} 
+                  onSelect={setActive} 
+                />
               </a-tab-pane>
             </a-tabs>
           </a-layout-sider>
