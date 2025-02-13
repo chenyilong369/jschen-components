@@ -9,6 +9,10 @@ export default defineComponent({
     active: {
       type: Boolean,
       default: false
+    },
+    hidden: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['setActive'],
@@ -17,7 +21,7 @@ export default defineComponent({
       emit('setActive', id)
     }
     return () => (
-      <div onClick={() => onItemClick(props.id)} class={{ "edit-wrapper": true, active: props.active }}>
+      <div onClick={() => onItemClick(props.id)} class={{ "edit-wrapper": true, active: props.active, hidden: props.hidden }}>
         {slots.default && slots.default()}
       </div>
     )

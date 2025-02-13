@@ -17,8 +17,8 @@ export interface UpdateComponentData {
 
 export interface ComponentData {
   layerName?: string;
-  isLocked?: boolean;
-  isHidden?: boolean;
+  isLocked?: boolean; // 图层是否锁定
+  isHidden?: boolean; // 图层是否隐藏
   props: Partial<AllComponentProps>;
   id: string;
   name: string;
@@ -76,10 +76,15 @@ const editor: Module<EditorProps, GlobalDataProps> = {
     setActive(state, currentId: string) {
       state.currentElement = currentId
     },
-    updateComponent(state, { key, value }: UpdateComponentData) {
-      const updateComponent = state.components.find((item) => item.id === state.currentElement)
+    updateComponent(state, { key, value, id, isRoot }: UpdateComponentData) {
+      const updateComponent = state.components.find((item) => item.id === (id || state.currentElement))
       if (updateComponent) {
-        updateComponent.props[key] = value
+        if (isRoot) {
+          (updateComponent as any)[key] = value;
+        } else {
+          updateComponent.props[key] = value
+        }
+
       }
     }
   },

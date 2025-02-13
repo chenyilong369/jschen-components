@@ -41,7 +41,7 @@ export default defineComponent({
       store.commit('deleteComponent')
     }
     return () => (
-      <div class="edtior-content">
+      <div class="editor-content">
         <a-layout class="content-row">
           <a-layout-sider width="300" style="background: #fff">
             <div class="sidebar-container">
@@ -54,7 +54,6 @@ export default defineComponent({
           <a-layout style="padding: 0 24px 24px">
             <a-layout-content class="preview-container">
               <p>画布区域</p>
-              <history-area></history-area>
               <div class="preview-list" id="canvas-area">
                 <div class="body-container">
                   {
@@ -62,6 +61,7 @@ export default defineComponent({
                       <EditWrapper
                         key={item.id}
                         id={item.id}
+                        hidden={item.isHidden}
                         onSetActive={setActive}
                         active={item.id === (currentElement.value && currentElement.value.id)}
                       >
@@ -85,25 +85,30 @@ export default defineComponent({
                   currentElement?.value ? (
                     <>
                       {
-                        currentElement.value?.props ? <PropsTable props={currentElement.value.props} onChange={handleChange} /> : ''
-                      }
-                      {currentElement.value ? <a-button type="primary" onClick={deleteComponent}>删除组件</a-button> : ''}
-                    </>
-                  ) :
-                    (
-                      <div>
-                        <div>
-                          <a-empty>
+                        !currentElement.value.isLocked ? (
+                          <>
                             {
-                              {
-                                description: () => <p>该元素被锁定，无法编辑</p>,
-                                default: () => ''
-                              }
+                              currentElement.value?.props ? <PropsTable props={currentElement.value.props} onChange={handleChange} /> : ''
                             }
-                          </a-empty>
-                        </div>
-                      </div>
-                    )
+                            {currentElement.value ? <a-button type="primary" onClick={deleteComponent}>删除组件</a-button> : ''}
+                          </>
+                        ) : (
+                          <div>
+                            <div>
+                              <a-empty>
+                                {
+                                  {
+                                    description: () => <p>该元素被锁定，无法编辑</p>,
+                                    default: () => ''
+                                  }
+                                }
+                              </a-empty>
+                            </div>
+                          </div>
+                        )
+                      }
+                    </>
+                  ) : null
                 }
                 <pre>
                   {Object.keys(currentElement.value?.props || {}).map((item) => {
@@ -119,10 +124,10 @@ export default defineComponent({
 
               <a-tab-pane key="layer" tab="图层设置">
                 <LayerList
-                  list={components.value} 
-                  selectedId={currentElement.value ? currentElement.value?.id : ''} 
-                  onChange={handleChange} 
-                  onSelect={setActive} 
+                  list={components.value}
+                  selectedId={currentElement.value ? currentElement.value?.id : ''}
+                  onChange={(e) => handleChange(e)}
+                  onSelect={(e) => setActive(e)}
                 />
               </a-tab-pane>
             </a-tabs>

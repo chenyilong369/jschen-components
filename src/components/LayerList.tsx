@@ -42,7 +42,8 @@ export default defineComponent({
                 <a-button shape="circle" onClick={() => handleChange(element.id, 'isHidden', !element.isHidden)}>
                   {
                     {
-                      icon: () =>  element.isHidden ? <EyeOutlined /> : <EyeInvisibleOutlined />
+                      icon: () =>  element.isHidden ? <EyeOutlined /> : <EyeInvisibleOutlined />,
+                      default: () => ''
                     }
                   }
                 </a-button>
@@ -51,7 +52,8 @@ export default defineComponent({
                 <a-button shape="circle" onClick={() => handleChange(element.id, 'isLocked', !element.isLocked)}>
                   {
                     {
-                      icon: () =>  element.isLocked ? <UnlockOutlined /> : <LockOutlined />
+                      icon: () =>  element.isLocked ? <UnlockOutlined /> : <LockOutlined />,
+                      default: () => ''
                     }
                   }
                 </a-button>
