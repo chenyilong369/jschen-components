@@ -1,6 +1,8 @@
 import { ComponentData } from "@/store/editor";
 import { defineComponent, PropType } from "vue";
 import { EyeOutlined, EyeInvisibleOutlined, LockOutlined, UnlockOutlined, DragOutlined } from '@ant-design/icons-vue'
+import '@/styles/components/LayerList.scss'
+import InlineInput from './InlineInput'
 
 export default defineComponent({
   props: {
@@ -12,6 +14,9 @@ export default defineComponent({
       type: String,
       required: true
     }
+  },
+  components: {
+    InlineInput
   },
   emits: ['select', 'change', 'drop'],
   setup(props, context) {
@@ -38,11 +43,11 @@ export default defineComponent({
               class={element.id === props.selectedId ? 'active ant-list-item' : 'ant-list-item'}
               onClick={() => handleClick(element.id)}
             >
-              <a-tooltip title={element.isHidden ? '显示': '隐藏'}>
+              <a-tooltip title={element.isHidden ? '显示' : '隐藏'}>
                 <a-button shape="circle" onClick={() => handleChange(element.id, 'isHidden', !element.isHidden)}>
                   {
                     {
-                      icon: () =>  element.isHidden ? <EyeOutlined /> : <EyeInvisibleOutlined />,
+                      icon: () => element.isHidden ? <EyeOutlined /> : <EyeInvisibleOutlined />,
                       default: () => ''
                     }
                   }
@@ -52,13 +57,17 @@ export default defineComponent({
                 <a-button shape="circle" onClick={() => handleChange(element.id, 'isLocked', !element.isLocked)}>
                   {
                     {
-                      icon: () =>  element.isLocked ? <UnlockOutlined /> : <LockOutlined />,
+                      icon: () => element.isLocked ? <UnlockOutlined /> : <LockOutlined />,
                       default: () => ''
                     }
                   }
                 </a-button>
               </a-tooltip>
-              <span>{element.layerName}</span>
+              <inline-input class="edit-area" value={element.layerName} onChange={(value: boolean) => { handleChange(element.id, 'layerName', value) }}>
+                {{
+                  default: ({text}: any) => <span>{ text }</span>
+                }}
+              </inline-input>
             </li>
           ))
         }

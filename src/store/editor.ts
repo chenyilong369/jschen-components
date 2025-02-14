@@ -25,9 +25,9 @@ export interface ComponentData {
 }
 
 export const testComponents = [
-  { id: v4(), name: 'l-text', props: { text: 'hello1', width: '50px', height: '20px', fontSize: '25px', lineHeight: '1', textAlign: 'left', color: '#000000', borderStyle: 'none', borderWidth: '1px' } },
-  { id: v4(), name: 'l-text', props: { text: 'hello2', fontSize: '24px', lineHeight: '2', textAlign: 'right' } },
-  { id: v4(), name: 'l-text', props: { text: 'hello3', fontSize: '36px', url: '', actionType: 'url', fontFamily: '' } }
+  { id: v4(), name: 'l-text', layerName:'图层1', props: { text: 'hello1', width: '50px', height: '20px', fontSize: '25px', lineHeight: '1', textAlign: 'left', color: '#000000', borderStyle: 'none', borderWidth: '1px' } },
+  { id: v4(), name: 'l-text', layerName:'图层2', props: { text: 'hello2', fontSize: '24px', lineHeight: '2', textAlign: 'right' } },
+  { id: v4(), name: 'l-text', layerName:'图层3', props: { text: 'hello3', fontSize: '36px', url: '', actionType: 'url', fontFamily: '' } }
 ]
 
 export interface PageProps {
