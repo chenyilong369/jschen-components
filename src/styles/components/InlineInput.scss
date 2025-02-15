@@ -1,6 +1,9 @@
 .inline-edit {
   cursor: pointer;
 }
+.ant-input {
+  width: 100%;
+}
 .ant-input.input-error {
   border: 1px solid #f5222d;
 }

@@ -1,5 +1,5 @@
 import { GlobalDataProps } from ".";
-import { AllComponentProps } from '../defaultProps'
+import { AllComponentProps, imageDefaultProps, textDefaultProps } from '../defaultProps'
 import { Module } from "vuex";
 import { v4 } from 'uuid'
 
@@ -24,10 +24,11 @@ export interface ComponentData {
   name: string;
 }
 
-export const testComponents = [
-  { id: v4(), name: 'l-text', layerName:'图层1', props: { text: 'hello1', width: '50px', height: '20px', fontSize: '25px', lineHeight: '1', textAlign: 'left', color: '#000000', borderStyle: 'none', borderWidth: '1px' } },
-  { id: v4(), name: 'l-text', layerName:'图层2', props: { text: 'hello2', fontSize: '24px', lineHeight: '2', textAlign: 'right' } },
-  { id: v4(), name: 'l-text', layerName:'图层3', props: { text: 'hello3', fontSize: '36px', url: '', actionType: 'url', fontFamily: '' } }
+export const testComponents: ComponentData[] = [
+  { id: v4(), name: 'l-text', layerName:'图层1', props: { ...textDefaultProps, text: 'hello', fontSize: '20px', color: '#000000', 'lineHeight': '1', textAlign: 'left', fontFamily: '', width: '100px', height: '100px', backgroundColor: '#efefef', left: '100px', top: '150px' }},
+  { id: v4(), name: 'l-text', layerName:'图层2', props: { ...textDefaultProps, text: 'hello2', fontSize: '10px', fontWeight: 'bold', 'lineHeight': '2', textAlign: 'left', fontFamily: '' }},
+  { id: v4(), name: 'l-text', layerName:'图层3', props: { ...textDefaultProps, text: 'hello3', fontSize: '15px', actionType: 'url', url: 'https://www.baidu.com', 'lineHeight': '3', textAlign: 'left', fontFamily: '' }},
+  { id: v4(), name: 'l-image', layerName:'图层4', props: { ...imageDefaultProps, src: 'http://vue-maker.oss-cn-hangzhou.aliyuncs.com/vue-marker/5f3e3a17c305b1070f455202.jpg', width: '100px' }},
 ]
 
 export interface PageProps {
@@ -82,7 +83,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         if (isRoot) {
           (updateComponent as any)[key] = value;
         } else {
-          updateComponent.props[key] = value
+          updateComponent.props[key] = value.toString()
         }
 
       }

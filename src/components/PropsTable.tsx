@@ -6,6 +6,8 @@ import '@/styles/components/PropsTable.scss'
 import { defineComponent, computed, PropType, h, resolveComponent, VNode } from 'vue'
 import { transformEventName } from '@/utils/transform'
 import ColorPicker from './ColorPicker'
+import ShadowPicker from './ShadowPicker'
+import IconSwitch from './IconSwitch'
 
 interface FormProps {
   component: string;
@@ -29,7 +31,9 @@ export default defineComponent({
   },
   components: {
     ColorPicker,
-    ImageProcesser
+    ImageProcesser,
+    ShadowPicker,
+    IconSwitch
   },
   emits: ['change'],
   setup(props, context) {
@@ -62,11 +66,11 @@ export default defineComponent({
             const newKey = key as keyof PropToForms
             const value = finalProps.value[newKey]
             return (
-              <div class="prop-item" key={key}>
+              <div class={{'prop-item': true, 'no-text': !value.text}} key={key}>
                 {
                   value?.text ? <span class="label">{value.text}</span> : ''
                 }
-                <div class="prop-component">
+                <div class={`prop-component component-${value.component}`}>
                   {
                     value ? h(resolveComponent(value.component), { [value.valueProp]: value.value, ...value.events, ...value.extraProps }, {
                       default: () => (

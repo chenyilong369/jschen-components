@@ -1,8 +1,9 @@
 import { ComponentData } from "@/store/editor";
-import { defineComponent, PropType } from "vue";
+import { defineComponent, PropType, ref } from "vue";
 import { EyeOutlined, EyeInvisibleOutlined, LockOutlined, UnlockOutlined, DragOutlined } from '@ant-design/icons-vue'
 import '@/styles/components/LayerList.scss'
 import InlineInput from './InlineInput'
+import draggable from 'vuedraggable'
 
 export default defineComponent({
   props: {
@@ -16,11 +17,11 @@ export default defineComponent({
     }
   },
   components: {
-    InlineInput
+    InlineInput,
+    draggable
   },
   emits: ['select', 'change', 'drop'],
   setup(props, context) {
-
     const handleClick = (id: string) => {
       context.emit('select', id)
     }
@@ -36,42 +37,59 @@ export default defineComponent({
     }
 
     return () => (
-      <ul class="ant-list-items ant-list-bordered">
+      <draggable
+        list={props.list}
+        class="ant-list-items ant-list-bordered"
+        ghost-class="ghost"
+        handle=".handle"
+        item-key="id"
+      >
         {
-          props?.list && props.list.map(element => (
-            <li
-              class={element.id === props.selectedId ? 'active ant-list-item' : 'ant-list-item'}
-              onClick={() => handleClick(element.id)}
-            >
-              <a-tooltip title={element.isHidden ? '显示' : '隐藏'}>
-                <a-button shape="circle" onClick={() => handleChange(element.id, 'isHidden', !element.isHidden)}>
+          {
+            item: (({ element }: { element: ComponentData }) => (
+              <li
+                class={element.id === props.selectedId ? 'active ant-list-item' : 'ant-list-item'}
+                onClick={() => handleClick(element.id)}
+              >
+                <a-tooltip title={element.isHidden ? '显示' : '隐藏'}>
+                  <a-button shape="circle" onClick={() => handleChange(element.id, 'isHidden', !element.isHidden)}>
+                    {
+                      {
+                        icon: () => element.isHidden ? <EyeOutlined /> : <EyeInvisibleOutlined />,
+                        default: () => ''
+                      }
+                    }
+                  </a-button>
+                </a-tooltip>
+                <a-tooltip title={element.isLocked ? '解锁' : '锁定'}>
+                  <a-button shape="circle" onClick={() => handleChange(element.id, 'isLocked', !element.isLocked)}>
+                    {
+                      {
+                        icon: () => element.isLocked ? <UnlockOutlined /> : <LockOutlined />,
+                        default: () => ''
+                      }
+                    }
+                  </a-button>
+                </a-tooltip>
+                <inline-input class="edit-area" value={element.layerName} onChange={(value: boolean) => { handleChange(element.id, 'layerName', value) }}>
+                  {{
+                    default: ({ text }: { text: string }) => <span>{text}</span>
+                  }}
+                </inline-input>
+                <a-button shape="circle" class="handle">
                   {
                     {
-                      icon: () => element.isHidden ? <EyeOutlined /> : <EyeInvisibleOutlined />,
+                      icon: () => <DragOutlined />,
                       default: () => ''
                     }
                   }
                 </a-button>
-              </a-tooltip>
-              <a-tooltip title={element.isLocked ? '解锁' : '锁定'}>
-                <a-button shape="circle" onClick={() => handleChange(element.id, 'isLocked', !element.isLocked)}>
-                  {
-                    {
-                      icon: () => element.isLocked ? <UnlockOutlined /> : <LockOutlined />,
-                      default: () => ''
-                    }
-                  }
-                </a-button>
-              </a-tooltip>
-              <inline-input class="edit-area" value={element.layerName} onChange={(value: boolean) => { handleChange(element.id, 'layerName', value) }}>
-                {{
-                  default: ({text}: any) => <span>{ text }</span>
-                }}
-              </inline-input>
-            </li>
-          ))
+              </li>
+            )),
+            default: () => ''
+          }
         }
-      </ul>
+      </draggable>
     )
   }
 })

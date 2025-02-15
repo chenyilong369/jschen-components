@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "ant-design-vue": "^4.2.3",
+    "array-move": "^4.0.0",
     "axios": "^0.27.0",
     "core-js": "^3.6.5",
     "cropperjs": "^1.5.11",
@@ -19,7 +20,7 @@
     "uuid": "^10.0.0",
     "vue": "^3.0.0",
     "vue-router": "^4.4.3",
-    "vuedraggable": "^2.24.3",
+    "vuedraggable": "^4.1.0",
     "vuex": "^4.1.0"
   },
   "devDependencies": {

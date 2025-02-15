@@ -6,6 +6,7 @@ import LayerList from '../components/LayerList'
 import { useStore } from 'vuex'
 import '@/styles/Editor.scss'
 import LText from '../components/LText'
+import EditGroup from '../components/EditGroup'
 import LImage from '@/components/LImage';
 import { GlobalDataProps } from '../store/index'
 import { ComponentData } from '../store/editor'
@@ -19,6 +20,7 @@ export default defineComponent({
     LText,
     PropsTable,
     LImage,
+    EditGroup,
     ComponentsList,
     EditWrapper
   },
@@ -87,9 +89,10 @@ export default defineComponent({
                       {
                         !currentElement.value.isLocked ? (
                           <>
-                            {
-                              currentElement.value?.props ? <PropsTable props={currentElement.value.props} onChange={handleChange} /> : ''
-                            }
+                            <edit-group
+                              props={currentElement.value.props}
+                              onChange={handleChange}
+                            />
                             {currentElement.value ? <a-button type="primary" onClick={deleteComponent}>删除组件</a-button> : ''}
                           </>
                         ) : (
