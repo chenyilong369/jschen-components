@@ -7,7 +7,9 @@
   &:hover {
     border: 1px dashed #ccc;
   }
-
+  > * {
+    position: static !important;
+  }
 
 }
 

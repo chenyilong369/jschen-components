@@ -1,5 +1,6 @@
-import { defineComponent } from 'vue'
+import { computed, defineComponent } from 'vue'
 import '@/styles/components/EditWrapper.scss'
+import { pick } from 'lodash-es'
 export default defineComponent({
   props: {
     id: {
@@ -13,6 +14,9 @@ export default defineComponent({
     hidden: {
       type: Boolean,
       default: false
+    },
+    props: {
+      type: Object
     }
   },
   emits: ['setActive'],
@@ -20,8 +24,13 @@ export default defineComponent({
     const onItemClick = (id: string) => {
       emit('setActive', id)
     }
+    const styles = computed(() => pick(props.props, ['position', 'top', 'left', 'width', 'height']))
     return () => (
-      <div onClick={() => onItemClick(props.id)} class={{ "edit-wrapper": true, active: props.active, hidden: props.hidden }}>
+      <div 
+        onClick={() => onItemClick(props.id)} 
+        style={styles.value} 
+        class={{ "edit-wrapper": true, active: props.active, hidden: props.hidden }}
+      >
         {slots.default && slots.default()}
       </div>
     )

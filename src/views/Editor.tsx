@@ -70,6 +70,7 @@ export default defineComponent({
                         id={item.id}
                         hidden={item.isHidden}
                         onSetActive={setActive}
+                        props={item.props}
                         active={item.id === (currentElement.value && currentElement.value.id)}
                       >
                         {{
