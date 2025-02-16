@@ -8,6 +8,7 @@ import { transformEventName } from '@/utils/transform'
 import ColorPicker from './ColorPicker'
 import ShadowPicker from './ShadowPicker'
 import IconSwitch from './IconSwitch'
+import BackgroundProcesser from './BackgroundProcesser'
 
 interface FormProps {
   component: string;
@@ -33,7 +34,8 @@ export default defineComponent({
     ColorPicker,
     ImageProcesser,
     ShadowPicker,
-    IconSwitch
+    IconSwitch,
+    BackgroundProcesser
   },
   emits: ['change'],
   setup(props, context) {

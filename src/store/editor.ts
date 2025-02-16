@@ -6,6 +6,7 @@ import { v4 } from 'uuid'
 export interface EditorProps {
   components: ComponentData[];
   currentElement: string; // 当前选中组件id
+  page: PageData;
 }
 
 export interface UpdateComponentData {
@@ -62,10 +63,16 @@ export interface PageData {
   };
 }
 
+const pageDefaultProps = { backgroundColor: '#ffffff', backgroundImage: '', backgroundRepeat: 'no-repeat', backgroundSize: 'cover', height: '600px' }
+
 const editor: Module<EditorProps, GlobalDataProps> = {
   state: {
     components: testComponents,
-    currentElement: ''
+    currentElement: '',
+    page: {
+      props: pageDefaultProps,
+      title: 'test title'
+    },
   },
   mutations: {
     addComponent(state, component: ComponentData) {
@@ -87,7 +94,22 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         }
 
       }
-    }
+    },
+    updatePage: (state, { key, value, isRoot, isSetting }) => {
+      if (isRoot) {
+        state.page[key as keyof PageData] = value
+      } else if (isSetting) {
+        debugger
+        state.page.setting = {
+          ...state.page.setting,
+          [key]: value
+        }
+      } else {
+        if (state.page.props) {
+          state.page.props[key as keyof PageProps] = value
+        }
+      }
+    },
   },
   getters: {
     getCurrentElement: (state) => {

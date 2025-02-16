@@ -4,7 +4,7 @@ import { EyeOutlined, EyeInvisibleOutlined, LockOutlined, UnlockOutlined, DragOu
 import '@/styles/components/LayerList.scss'
 import { arrayMoveMutable } from 'array-move'
 import InlineInput from './InlineInput'
-
+// 修改外部数据源顺序来实现拖动
 export default defineComponent({
   props: {
     list: {

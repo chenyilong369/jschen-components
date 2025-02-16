@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, resolveComponent, ref } from 'vue'
+import { defineComponent, computed, h, resolveComponent, ref, CSSProperties } from 'vue'
 import EditWrapper from '../components/EditWrapper'
 import ComponentsList from '../components/ComponentsList';
 import defaultTextTemplates from '../defaultTemplates'
@@ -27,6 +27,7 @@ export default defineComponent({
   setup() {
     const store = useStore<GlobalDataProps>();
     const components = computed(() => store.state.editor.components)
+    const page = computed(() => store.state.editor.page)
     const componentList = computed(() => defaultTextTemplates)
     const activePanel = ref<TabType>('component')
     const currentElement = computed<ComponentData | null>(() => store.getters.getCurrentElement)
@@ -41,6 +42,10 @@ export default defineComponent({
     }
     const deleteComponent = () => {
       store.commit('deleteComponent')
+    }
+    const pageChange = (e: any) => {
+      console.log('page', e)
+      store.commit('updatePage', e)
     }
     return () => (
       <div class="editor-content">
@@ -57,7 +62,7 @@ export default defineComponent({
             <a-layout-content class="preview-container">
               <p>画布区域</p>
               <div class="preview-list" id="canvas-area">
-                <div class="body-container">
+                <div class="body-container" style={page.value.props as CSSProperties}>
                   {
                     components.value?.map(item => (
                       <EditWrapper
@@ -132,6 +137,10 @@ export default defineComponent({
                   onChange={(e) => handleChange(e)}
                   onSelect={(e) => setActive(e)}
                 />
+              </a-tab-pane>
+
+              <a-tab-pane key="page" tab="页面设置">
+                <props-table props={page.value.props} onChange={pageChange}></props-table>
               </a-tab-pane>
             </a-tabs>
           </a-layout-sider>

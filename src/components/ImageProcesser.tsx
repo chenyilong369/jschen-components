@@ -47,11 +47,11 @@ export default defineComponent({
           cropper = new Cropper(cropperImg.value, {
             checkCrossOrigin: false,
             crop(event) {
-              console.log(event)
               const { x, y, width, height } = event.detail
+              console.log(event)
               cropData = {
-                x: Math.floor(x),
-                y: Math.floor(y),
+                x: x > 0 ? Math.floor(x) : 0,
+                y: y > 0 ? Math.floor(y) : 0, // 取（0，0）坐标时有微小误差为负数
                 width: Math.floor(width),
                 height: Math.floor(height)
               }
