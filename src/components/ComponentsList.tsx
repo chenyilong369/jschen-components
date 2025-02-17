@@ -1,5 +1,4 @@
 import { defineComponent } from 'vue'
-import LText from './LText'
 import StyledUploader from './StyledUploader'
 import { message } from 'ant-design-vue';
 import { v4 } from 'uuid';
@@ -7,6 +6,7 @@ import { ComponentData } from '@/store/editor';
 import { UploadResp } from '@/extraType';
 import { imageDefaultProps } from '@/defaultProps';
 import { getImageDimensions } from '@/utils/helper';
+import "@/styles/components/ComponentsList.scss"
 export default defineComponent({
   props: {
     list: {
@@ -17,7 +17,6 @@ export default defineComponent({
   emits: ['itemCreate'],
   name: 'components-list',
   components: {
-    LText,
     StyledUploader
   },
   setup(props, context) {
@@ -51,8 +50,8 @@ export default defineComponent({
       <div class="create-component-list">
         {
           props.list.map((item: any, index) => (
-            <div key={index} onClick={() => onItemClick({...item})} class="component-wrapper">
-              <LText {...item}></LText>
+            <div key={index} onClick={() => onItemClick({...item})} class="component-item">
+              <l-text {...item}></l-text>
             </div>
           ))
         }

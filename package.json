@@ -14,7 +14,7 @@
     "axios": "^0.27.0",
     "core-js": "^3.6.5",
     "cropperjs": "^1.5.11",
-    "jschen-bricks": "^1.0.1",
+    "jschen-bricks": "^1.0.6",
     "lodash-es": "^4.17.21",
     "rgb-hex": "^3.0.0",
     "uuid": "^10.0.0",

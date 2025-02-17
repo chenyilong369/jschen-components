@@ -5,9 +5,7 @@ import defaultTextTemplates from '../defaultTemplates'
 import LayerList from '../components/LayerList'
 import { useStore } from 'vuex'
 import '@/styles/Editor.scss'
-import LText from '../components/LText'
 import EditGroup from '../components/EditGroup'
-import LImage from '@/components/LImage';
 import { GlobalDataProps } from '../store/index'
 import { ComponentData } from '../store/editor'
 import { AllComponentProps } from '@/defaultProps';
@@ -18,9 +16,7 @@ export type TabType = 'component' | 'layer' | 'page'
 export default defineComponent({
   name: 'Editor',
   components: {
-    LText,
     PropsTable,
-    LImage,
     EditGroup,
     ComponentsList,
     EditWrapper
