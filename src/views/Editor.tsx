@@ -12,6 +12,7 @@ import { GlobalDataProps } from '../store/index'
 import { ComponentData } from '../store/editor'
 import { AllComponentProps } from '@/defaultProps';
 import PropsTable from '@/components/PropsTable';
+import { pickBy } from 'lodash-es';
 
 export type TabType = 'component' | 'layer' | 'page'
 export default defineComponent({
@@ -47,6 +48,13 @@ export default defineComponent({
       console.log('page', e)
       store.commit('updatePage', e)
     }
+    const updatePosition = (data: { left: number; top: number; id: string }) => {
+      const { id } = data
+      const updatedData = pickBy<number>(data, (v, k) => k !== 'id')
+      const keysArr = Object.keys(updatedData)
+      const valuesArr = Object.values(updatedData).map(v => v + 'px')
+      store.commit('updateComponent', { key: keysArr, value: valuesArr, id })
+    }
     return () => (
       <div class="editor-content">
         <a-layout class="content-row">
@@ -70,6 +78,7 @@ export default defineComponent({
                         id={item.id}
                         hidden={item.isHidden}
                         onSetActive={setActive}
+                        onUpdatePosition={updatePosition}
                         props={item.props}
                         active={item.id === (currentElement.value && currentElement.value.id)}
                       >

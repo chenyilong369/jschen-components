@@ -90,7 +90,13 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         if (isRoot) {
           (updateComponent as any)[key] = value;
         } else {
-          updateComponent.props[key] = value.toString()
+          if (Array.isArray(key) && Array.isArray(value)) {
+            key.forEach((keyName: keyof AllComponentProps, index) => {
+              updateComponent.props[keyName] = value[index]
+            })
+          } else if (typeof key ==='string' && typeof value === 'string') {
+            updateComponent.props[key] = value.toString()
+          }
         }
 
       }
