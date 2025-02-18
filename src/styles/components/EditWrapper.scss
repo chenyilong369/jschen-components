@@ -25,6 +25,7 @@
 }
 .edit-wrapper.active .resizers {
   display: block;
+  width: 0 !important;
 }
 .edit-wrapper.active .resizers .resizer {
   width: 10px;

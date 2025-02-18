@@ -11,6 +11,7 @@ import { ComponentData } from '../store/editor'
 import { AllComponentProps } from '@/defaultProps';
 import PropsTable from '@/components/PropsTable';
 import { pickBy } from 'lodash-es';
+import initHotKeys from '@/plugins/hotKeys';
 
 export type TabType = 'component' | 'layer' | 'page'
 export default defineComponent({
@@ -22,6 +23,7 @@ export default defineComponent({
     EditWrapper
   },
   setup() {
+    initHotKeys()
     const store = useStore<GlobalDataProps>();
     const components = computed(() => store.state.editor.components)
     const page = computed(() => store.state.editor.page)

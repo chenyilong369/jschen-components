@@ -4,12 +4,24 @@ import { Module } from "vuex";
 import { v4 } from 'uuid'
 import { message } from "ant-design-vue";
 import { cloneDeep } from "lodash-es";
+export type MoveDirection = 'Up' | 'Down' | 'Left' | 'Right'
+export type HistoryType = 'add' | 'delete' | 'modify'
+
+export interface HistoryProps {
+  id: string;
+  componentId: string;
+  type: HistoryType;
+  data: any;
+  index?: number; // 保存删除时原图层在数组中的位置
+}
 
 export interface EditorProps {
   components: ComponentData[];
   currentElement: string; // 当前选中组件id
   page: PageData;
   copiedComponent?: ComponentData;
+  histories: HistoryProps[];
+  historyIndex: number; // 记录目前走到哪个历史记录
 }
 
 export interface UpdateComponentData {
@@ -76,13 +88,34 @@ const editor: Module<EditorProps, GlobalDataProps> = {
       props: pageDefaultProps,
       title: 'test title'
     },
+    histories: [],
+    historyIndex: -1
   },
   mutations: {
     addComponent(state, component: ComponentData) {
+      component.layerName = '图层' + (state.components.length + 1)
       state.components.push(component)
+      state.histories.push({
+        id: v4(),
+        componentId: component.id,
+        type: 'add',
+        data: cloneDeep(component)
+      })
     },
-    deleteComponent(state) {
-      state.components = state.components.filter(component => component.id !== state.currentElement)
+    deleteComponent(state, id) {
+      const currentElement = store.getters.getElement(id)
+      if (currentElement) {
+        const currentIndex = state.components.findIndex(component => component.id === id)
+        state.components = state.components.filter(component => component.id !== id)
+        state.histories.push({
+          id: v4(),
+          componentId: currentElement.id,
+          type: 'delete',
+          data: currentElement, // 不会修改，直接保存
+          index: currentIndex
+        })
+        message.success('删除当前图层成功', 1)
+      }
     },
     setActive(state, currentId: string) {
       state.currentElement = currentId
@@ -93,6 +126,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         if (isRoot) {
           (updateComponent as any)[key] = value;
         } else {
+          const oldValue = Array.isArray(key) ? key.map((key: keyof AllComponentProps) => updateComponent.props[key]) : updateComponent.props[key]
           if (Array.isArray(key) && Array.isArray(value)) {
             key.forEach((keyName: keyof AllComponentProps, index) => {
               updateComponent.props[keyName] = value[index]
@@ -100,6 +134,16 @@ const editor: Module<EditorProps, GlobalDataProps> = {
           } else if (typeof key ==='string' && typeof value === 'string') {
             updateComponent.props[key] = value.toString()
           }
+          state.histories.push({
+            id: v4(),
+            componentId: (id || state.currentElement),
+            data: {
+              oldValue,
+              newValue: value,
+              key
+            },
+            type: 'modify'
+          })
         }
 
       }
@@ -119,6 +163,38 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         }
       }
     },
+    moveComponent: (state, data: { direction: MoveDirection; amount: number; id: string }) => {
+      const currentComponent = store.getters.getElement(data.id) as ComponentData
+      if (currentComponent) {
+        const oldTop = parseInt(currentComponent.props.top || '0')
+        const oldLeft = parseInt(currentComponent.props.left || '0')
+        const {direction, amount} = data
+        switch(direction) {
+          case 'Up': {
+            const newValue = oldTop - amount + 'px'
+            store.commit('updateComponent', { key: 'top', value: newValue, id: data.id })
+            break
+          }
+          case 'Down': {
+            const newValue = oldTop + amount + 'px'
+            store.commit('updateComponent', { key: 'top', value: newValue, id: data.id })
+            break
+          }
+          case 'Left': {
+            const newValue = oldLeft - amount + 'px'
+            store.commit('updateComponent', { key: 'left', value: newValue, id: data.id })
+            break
+          }
+          case 'Right': {
+            const newValue = oldLeft + amount + 'px'
+            store.commit('updateComponent', { key: 'left', value: newValue, id: data.id })
+            break
+          }
+          default:
+            break
+        }
+      }
+    },
     copyComponent: (state, id) => {
       const currentElement = store.getters.getElement(id)
       if (currentElement) {
@@ -133,6 +209,13 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         clone.layerName = clone.layerName + '副本'
         state.components.push(clone)
         message.success('已黏贴当前图层', 1)
+
+        state.histories.push({
+          id: v4(),
+          componentId: clone.id,
+          type: 'add',
+          data: cloneDeep(clone)
+        })
       }
     }
   },

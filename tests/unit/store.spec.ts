@@ -1,4 +1,4 @@
-import { TextComponentProps } from "@/defaultProps";
+import { TextComponentProps, textDefaultProps } from "@/defaultProps";
 import store from "@/store";
 import { ComponentData, testComponents } from "@/store/editor";
 import { testData } from "@/store/templates";
@@ -47,7 +47,8 @@ describe('test vuex', () => {
     })
     it('add component should work fine', () => {
       const payload: Partial<TextComponentProps> ={
-        text: 'text1'
+        ...textDefaultProps,
+        text: 'text1',
       }
       const newComponent: ComponentData = {
         id: v4(),
