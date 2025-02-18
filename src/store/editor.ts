@@ -4,6 +4,7 @@ import { Module } from "vuex";
 import { v4 } from 'uuid'
 import { message } from "ant-design-vue";
 import { cloneDeep } from "lodash-es";
+import { insertAt } from "@/utils/helper";
 export type MoveDirection = 'Up' | 'Down' | 'Left' | 'Right'
 export type HistoryType = 'add' | 'delete' | 'modify'
 
@@ -146,6 +147,33 @@ const editor: Module<EditorProps, GlobalDataProps> = {
           })
         }
 
+      }
+    },
+    undo: (state) => {
+      if (state.historyIndex === -1) {
+        state.historyIndex = state.histories.length - 1
+      } else {
+        state.historyIndex--
+      }
+      const history = state.histories[state.historyIndex]
+      switch (history.type) {
+        case "add":
+          state.components = state.components.filter(component => component.id !== history.componentId)
+          break
+        case "delete":
+          state.components = insertAt(state.components, history.index as number, history.data)
+          break
+        case "modify": {
+          const {componentId, data} = history
+          const { key, oldValue } = data
+          const updateComponent = state.components.find(component => component.id === componentId)
+          if (updateComponent) {
+            updateComponent.props[key as keyof AllComponentProps] = oldValue
+          }
+          break
+        }
+        default: 
+          break
       }
     },
     updatePage: (state, { key, value, isRoot, isSetting }) => {
