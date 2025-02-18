@@ -1,12 +1,15 @@
-import { GlobalDataProps } from ".";
+import store, { GlobalDataProps } from ".";
 import { AllComponentProps, imageDefaultProps, textDefaultProps } from '../defaultProps'
 import { Module } from "vuex";
 import { v4 } from 'uuid'
+import { message } from "ant-design-vue";
+import { cloneDeep } from "lodash-es";
 
 export interface EditorProps {
   components: ComponentData[];
   currentElement: string; // 当前选中组件id
   page: PageData;
+  copiedComponent?: ComponentData;
 }
 
 export interface UpdateComponentData {
@@ -116,11 +119,30 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         }
       }
     },
+    copyComponent: (state, id) => {
+      const currentElement = store.getters.getElement(id)
+      if (currentElement) {
+        state.copiedComponent = currentElement
+        message.success('已拷贝当前图层', 1)
+      }
+    },
+    pasteCopiedComponent: (state) => {
+      if (state.copiedComponent) {
+        const clone = cloneDeep(state.copiedComponent)
+        clone.id = v4()
+        clone.layerName = clone.layerName + '副本'
+        state.components.push(clone)
+        message.success('已黏贴当前图层', 1)
+      }
+    }
   },
   getters: {
     getCurrentElement: (state) => {
       return state.components.find((item) => item.id === state.currentElement)
-    }
+    },
+    getElement: (state) => (id: string) => {
+      return state.components.find((component) => component.id === (id || state.currentElement))
+    },
   }
 }
 
