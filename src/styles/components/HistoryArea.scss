@@ -1,0 +1,11 @@
+.history-area {
+  position: absolute;
+  right: 0;
+  z-index: 500;
+}
+.operation-list {
+  display: flex;
+}
+.history-area .bold {
+  font-weight: bold;
+}

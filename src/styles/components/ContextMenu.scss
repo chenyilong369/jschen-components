@@ -1,0 +1,27 @@
+.menu-container {
+  display: none;
+  position: absolute;
+  background: #fff;
+  z-index: 2000;
+  width: 275px; 
+  border-bottom: 1px solid #ccc;
+
+}
+.menu-container .ant-menu-item {
+  transition: all 0.3s ease-out;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+}
+.menu-container .ant-menu-item:hover {
+  transition: all 0.3s ease-out;
+  color: #1677ff;
+  background: #efefef;
+}
+.ant-menu-item .item-shortcut {
+  color: #ccc;
+}

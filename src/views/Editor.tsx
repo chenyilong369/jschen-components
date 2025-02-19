@@ -8,10 +8,12 @@ import '@/styles/Editor.scss'
 import EditGroup from '../components/EditGroup'
 import { GlobalDataProps } from '../store/index'
 import { ComponentData } from '../store/editor'
+import HistoryArea from './editor/HistoryArea';
 import { AllComponentProps } from '@/defaultProps';
 import PropsTable from '@/components/PropsTable';
 import { pickBy } from 'lodash-es';
 import initHotKeys from '@/plugins/hotKeys';
+import initContextMenu from '@/plugins/initContext';
 
 export type TabType = 'component' | 'layer' | 'page'
 export default defineComponent({
@@ -20,10 +22,12 @@ export default defineComponent({
     PropsTable,
     EditGroup,
     ComponentsList,
+    HistoryArea,
     EditWrapper
   },
   setup() {
     initHotKeys()
+    initContextMenu()
     const store = useStore<GlobalDataProps>();
     const components = computed(() => store.state.editor.components)
     const page = computed(() => store.state.editor.page)
@@ -43,7 +47,6 @@ export default defineComponent({
       store.commit('deleteComponent')
     }
     const pageChange = (e: any) => {
-      console.log('page', e)
       store.commit('updatePage', e)
     }
     const updatePosition = (data: { left: number; top: number; id: string }) => {
@@ -67,6 +70,7 @@ export default defineComponent({
           <a-layout style="padding: 0 24px 24px">
             <a-layout-content class="preview-container">
               <p>画布区域</p>
+              <HistoryArea></HistoryArea>
               <div class="preview-list" id="canvas-area">
                 <div class="body-container" style={page.value.props as CSSProperties}>
                   {

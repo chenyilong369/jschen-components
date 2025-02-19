@@ -23,6 +23,8 @@ export interface EditorProps {
   copiedComponent?: ComponentData;
   histories: HistoryProps[];
   historyIndex: number; // 记录目前走到哪个历史记录
+  cachedOldValues: any;
+  maxHistoryNumber: number;
 }
 
 export interface UpdateComponentData {
@@ -42,7 +44,7 @@ export interface ComponentData {
 }
 
 export const testComponents: ComponentData[] = [
-  { id: v4(), name: 'l-text', layerName:'图层1', props: { ...textDefaultProps, text: 'hello', fontSize: '20px', color: '#000000', 'lineHeight': '1', textAlign: 'left', fontFamily: '', width: '100px', height: '100px', backgroundColor: '#efefef', left: '100px', top: '150px' }},
+  { id: v4(), name: 'l-text', layerName: '图层1', props: { ...textDefaultProps, text: 'hello', fontSize: '20px', color: '#000000', 'lineHeight': '1', textAlign: 'left', fontFamily: '', width: '100px', height: '100px', backgroundColor: '#efefef', left: '100px', top: '150px' } },
   // { id: v4(), name: 'l-text', layerName:'图层2', props: { ...textDefaultProps, text: 'hello2', fontSize: '10px', fontWeight: 'bold', 'lineHeight': '2', textAlign: 'left', fontFamily: '' }},
   // { id: v4(), name: 'l-text', layerName:'图层3', props: { ...textDefaultProps, text: 'hello3', fontSize: '15px', actionType: 'url', url: 'https://www.baidu.com', 'lineHeight': '3', textAlign: 'left', fontFamily: '' }},
   // { id: v4(), name: 'l-image', layerName:'图层4', props: { ...imageDefaultProps, src: 'http://vue-maker.oss-cn-hangzhou.aliyuncs.com/vue-marker/5f3e3a17c305b1070f455202.jpg', width: '100px' }},
@@ -71,7 +73,7 @@ export interface PageData {
   author?: string;
   copiedCount?: number;
   status?: number;
-  user? : {
+  user?: {
     gender: string;
     nickName: string;
     picture: string;
@@ -80,6 +82,59 @@ export interface PageData {
 }
 
 const pageDefaultProps = { backgroundColor: '#ffffff', backgroundImage: '', backgroundRepeat: 'no-repeat', backgroundSize: 'cover', height: '600px' }
+
+const pushHistory = (state: EditorProps, historyRecord: HistoryProps) => {
+  if (state.historyIndex !== -1) {
+    state.histories = state.histories.slice(0, state.historyIndex)
+    state.historyIndex = -1
+  }
+  if (state.histories.length < state.maxHistoryNumber) {
+    state.histories.push(historyRecord)
+  } else {
+    state.histories.shift()
+    state.histories.push(historyRecord)
+  }
+}
+
+const modifyHistory = (state: EditorProps, history: HistoryProps, type: 'undo' | 'redo') => {
+  const { componentId, data } = history
+  const { key, oldValue, newValue } = data
+  const newKey = key as keyof AllComponentProps | Array<keyof AllComponentProps>
+  const updatedComponent = state.components.find((component) => component.id === componentId)
+  if (updatedComponent) {
+    if (Array.isArray(newKey)) {
+      newKey.forEach((keyName, index) => {
+        updatedComponent.props[keyName] = type === 'undo' ? oldValue[index] : newValue[index]
+      })
+    } else {
+      updatedComponent.props[newKey] = type === 'undo' ? oldValue : newValue
+    }
+  }
+}
+
+const debounceChange = (callabck: (...args: any) => void, timeout=1000) => {
+  let timer = 0
+  return (...args: any) => {
+    clearTimeout(timer)
+    timer = setTimeout(() => {
+      console.log(timer)
+      callabck(...args)
+      timer = 0
+    }, timeout)
+  }
+}
+
+const pushModifyHistory = (state: EditorProps, { key, value, id }: UpdateComponentData) => {
+  pushHistory(state, {
+    id: v4(),
+    componentId: (id || state.currentElement),
+    type: 'modify',
+    data: { oldValue: state.cachedOldValues, newValue: value, key }
+  })
+  state.cachedOldValues = null
+}
+
+const pushHistoryDebounce = debounceChange(pushModifyHistory)
 
 const editor: Module<EditorProps, GlobalDataProps> = {
   state: {
@@ -90,29 +145,40 @@ const editor: Module<EditorProps, GlobalDataProps> = {
       title: 'test title'
     },
     histories: [],
-    historyIndex: -1
+    historyIndex: -1,
+    cachedOldValues: null,
+    maxHistoryNumber: 5
   },
   mutations: {
+    // 重置画布
+    resetEditor(state) {
+      state.components = []
+      state.currentElement = ''
+      state.historyIndex = -1
+      state.histories = []
+    },
+    // 新增元素调用
     addComponent(state, component: ComponentData) {
       component.layerName = '图层' + (state.components.length + 1)
       state.components.push(component)
-      state.histories.push({
+      pushHistory(state, {
         id: v4(),
         componentId: component.id,
         type: 'add',
         data: cloneDeep(component)
       })
     },
+    // 删除元素调用
     deleteComponent(state, id) {
       const currentElement = store.getters.getElement(id)
       if (currentElement) {
         const currentIndex = state.components.findIndex(component => component.id === id)
         state.components = state.components.filter(component => component.id !== id)
-        state.histories.push({
+        pushHistory(state, {
           id: v4(),
           componentId: currentElement.id,
           type: 'delete',
-          data: currentElement, // 不会修改，直接保存
+          data: currentElement,
           index: currentIndex
         })
         message.success('删除当前图层成功', 1)
@@ -121,6 +187,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
     setActive(state, currentId: string) {
       state.currentElement = currentId
     },
+    // 更新元素调用
     updateComponent(state, { key, value, id, isRoot }: UpdateComponentData) {
       const updateComponent = state.components.find((item) => item.id === (id || state.currentElement))
       if (updateComponent) {
@@ -128,27 +195,23 @@ const editor: Module<EditorProps, GlobalDataProps> = {
           (updateComponent as any)[key] = value;
         } else {
           const oldValue = Array.isArray(key) ? key.map((key: keyof AllComponentProps) => updateComponent.props[key]) : updateComponent.props[key]
+          if (!state.cachedOldValues) {
+            state.cachedOldValues = oldValue
+          }
+          pushHistoryDebounce(state, {key, value, id}, oldValue)
           if (Array.isArray(key) && Array.isArray(value)) {
             key.forEach((keyName: keyof AllComponentProps, index) => {
               updateComponent.props[keyName] = value[index]
             })
-          } else if (typeof key ==='string' && typeof value === 'string') {
+          } else if (typeof key === 'string' && typeof value === 'string') {
             updateComponent.props[key] = value.toString()
           }
-          state.histories.push({
-            id: v4(),
-            componentId: (id || state.currentElement),
-            data: {
-              oldValue,
-              newValue: value,
-              key
-            },
-            type: 'modify'
-          })
+
         }
 
       }
     },
+    // 测销操作
     undo: (state) => {
       if (state.historyIndex === -1) {
         state.historyIndex = state.histories.length - 1
@@ -164,18 +227,36 @@ const editor: Module<EditorProps, GlobalDataProps> = {
           state.components = insertAt(state.components, history.index as number, history.data)
           break
         case "modify": {
-          const {componentId, data} = history
-          const { key, oldValue } = data
-          const updateComponent = state.components.find(component => component.id === componentId)
-          if (updateComponent) {
-            updateComponent.props[key as keyof AllComponentProps] = oldValue
-          }
+          modifyHistory(state, history, 'undo')
           break
         }
-        default: 
+        default:
           break
       }
     },
+
+    // 恢复操作
+    redo: (state) => {
+      if (state.historyIndex === -1) return;
+
+      const history = state.histories[state.historyIndex]
+      switch (history.type) {
+        case "add":
+          state.components.push(history.data)
+          break;
+        case "delete":
+          state.components = state.components.filter(component => component.id !== history.componentId)
+          break
+        case "modify":
+          modifyHistory(state, history, 'redo')
+          break
+        default:
+          break
+      }
+      state.historyIndex++
+    },
+
+    // 更新页面设置
     updatePage: (state, { key, value, isRoot, isSetting }) => {
       if (isRoot) {
         state.page[key as keyof PageData] = value
@@ -191,13 +272,15 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         }
       }
     },
+
+    // 快捷键移动元素调用
     moveComponent: (state, data: { direction: MoveDirection; amount: number; id: string }) => {
       const currentComponent = store.getters.getElement(data.id) as ComponentData
       if (currentComponent) {
         const oldTop = parseInt(currentComponent.props.top || '0')
         const oldLeft = parseInt(currentComponent.props.left || '0')
-        const {direction, amount} = data
-        switch(direction) {
+        const { direction, amount } = data
+        switch (direction) {
           case 'Up': {
             const newValue = oldTop - amount + 'px'
             store.commit('updateComponent', { key: 'top', value: newValue, id: data.id })
@@ -223,6 +306,8 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         }
       }
     },
+
+    // 复制元素调用
     copyComponent: (state, id) => {
       const currentElement = store.getters.getElement(id)
       if (currentElement) {
@@ -230,6 +315,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         message.success('已拷贝当前图层', 1)
       }
     },
+    // 粘贴元素调用
     pasteCopiedComponent: (state) => {
       if (state.copiedComponent) {
         const clone = cloneDeep(state.copiedComponent)
@@ -238,7 +324,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         state.components.push(clone)
         message.success('已黏贴当前图层', 1)
 
-        state.histories.push({
+        pushHistory(state, {
           id: v4(),
           componentId: clone.id,
           type: 'add',
@@ -254,6 +340,23 @@ const editor: Module<EditorProps, GlobalDataProps> = {
     getElement: (state) => (id: string) => {
       return state.components.find((component) => component.id === (id || state.currentElement))
     },
+    checkUndoDisable: (state) => {
+      if (state.histories.length === 0 || state.historyIndex === 0) {
+        return true
+      }
+      return false
+    },
+    checkRedoDisable: (state) => {
+      // 1 no history item
+      // 2 move to the last item
+      // 3 never undo before
+      if (state.histories.length === 0 ||
+        state.historyIndex === state.histories.length ||
+        state.historyIndex === -1) {
+        return true
+      }
+      return false
+    }
   }
 }
 
