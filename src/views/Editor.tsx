@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, resolveComponent, ref, CSSProperties, onMounted } from 'vue'
+import { defineComponent, computed, h, resolveComponent, ref, CSSProperties, onMounted, onUnmounted } from 'vue'
 import EditWrapper from '../components/EditWrapper'
 import ComponentsList from '../components/ComponentsList';
 import defaultTextTemplates from '../defaultTemplates'
@@ -35,16 +35,35 @@ export default defineComponent({
     const route = useRoute()
     const currentWorkId = route.params.id
     const store = useStore<GlobalDataProps>();
+    const isDirty = computed(() => store.state.editor.isDirty)
     const components = computed(() => store.state.editor.components)
     const page = computed(() => store.state.editor.page)
     const componentList = computed(() => defaultTextTemplates)
     const userInfo = computed(() => store.state.user)
     const activePanel = ref<TabType>('component')
     const currentElement = computed<ComponentData | null>(() => store.getters.getCurrentElement)
+    const saveWork = (hiddenMessage = false) => {
+      const { title, props } = page.value
+      const payload = {
+        title,
+        content: {
+          props,
+          components: components.value
+        }
+      }
+      store.dispatch('saveWork', { data: payload, urlParams: { id: currentWorkId }, successMessage: hiddenMessage ? '' : '保存成功' })
+    }
+    let timer = 0;
     onMounted(() => {
       if (currentWorkId) {
         store.dispatch('fetchWork', { urlParams: { id: currentWorkId } })
       }
+      timer = setInterval(() => {
+        isDirty.value && saveWork(true)
+      }, 2000)
+    })
+    onUnmounted(() => {
+      clearInterval(timer)
     })
     const addItem = (component: ComponentData) => {
       store.commit('addComponent', component)
@@ -63,18 +82,6 @@ export default defineComponent({
     }
     const titleChange = (newTitle: string) => {
       store.commit('updatePage', { key: 'title', value: newTitle, isRoot: true })
-    }
-
-    const saveWork = () => {
-      const { title, props } = page.value
-      const payload = {
-        title,
-        content: {
-          props,
-          components: components.value
-        }
-      }
-      store.dispatch('saveWork', { data: payload, urlParams: { id: currentWorkId }, successMessage: '保存成功' })
     }
 
     const updatePosition = (data: { left: number; top: number; id: string }) => {

@@ -1,6 +1,6 @@
 import store, { actionWrapper, GlobalDataProps } from ".";
-import { AllComponentProps, imageDefaultProps, textDefaultProps } from '../defaultProps'
-import { Module } from "vuex";
+import { AllComponentProps, textDefaultProps } from '../defaultProps'
+import { Module, Mutation } from "vuex";
 import { v4 } from 'uuid'
 import { message } from "ant-design-vue";
 import { cloneDeep } from "lodash-es";
@@ -26,6 +26,7 @@ export interface EditorProps {
   historyIndex: number; // 记录目前走到哪个历史记录
   cachedOldValues: any;
   maxHistoryNumber: number;
+  isDirty: boolean; // 数据是否有修改
 }
 
 export interface UpdateComponentData {
@@ -137,6 +138,13 @@ const pushModifyHistory = (state: EditorProps, { key, value, id }: UpdateCompone
 
 const pushHistoryDebounce = debounceChange(pushModifyHistory)
 
+const setDirtyWrapper = (callback: Mutation<EditorProps>) => {
+  return (state: EditorProps, payload: any) => {
+    state.isDirty = true
+    callback(state, payload)
+  }
+}
+
 const editor: Module<EditorProps, GlobalDataProps> = {
   state: {
     components: testComponents,
@@ -148,7 +156,8 @@ const editor: Module<EditorProps, GlobalDataProps> = {
     histories: [],
     historyIndex: -1,
     cachedOldValues: null,
-    maxHistoryNumber: 5
+    maxHistoryNumber: 5,
+    isDirty: false
   },
   mutations: {
     // 重置画布
@@ -159,7 +168,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
       state.histories = []
     },
     // 新增元素调用
-    addComponent(state, component: ComponentData) {
+    addComponent: setDirtyWrapper((state, component: ComponentData) => {
       component.layerName = '图层' + (state.components.length + 1)
       state.components.push(component)
       pushHistory(state, {
@@ -168,9 +177,9 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         type: 'add',
         data: cloneDeep(component)
       })
-    },
+    }),
     // 删除元素调用
-    deleteComponent(state, id) {
+    deleteComponent: setDirtyWrapper((state, id) => {
       const currentElement = store.getters.getElement(id)
       if (currentElement) {
         const currentIndex = state.components.findIndex(component => component.id === id)
@@ -184,12 +193,12 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         })
         message.success('删除当前图层成功', 1)
       }
-    },
+    }),
     setActive(state, currentId: string) {
       state.currentElement = currentId
     },
     // 更新元素调用
-    updateComponent(state, { key, value, id, isRoot }: UpdateComponentData) {
+    updateComponent: setDirtyWrapper((state, { key, value, id, isRoot }: UpdateComponentData) => {
       const updateComponent = state.components.find((item) => item.id === (id || state.currentElement))
       if (updateComponent) {
         if (isRoot) {
@@ -211,7 +220,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         }
 
       }
-    },
+    }),
     // 测销操作
     undo: (state) => {
       if (state.historyIndex === -1) {
@@ -258,7 +267,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
     },
 
     // 更新页面设置
-    updatePage: (state, { key, value, isRoot, isSetting }) => {
+    updatePage: setDirtyWrapper((state, { key, value, isRoot, isSetting }) => {
       if (isRoot) {
         state.page[key as keyof PageData] = value
       } else if (isSetting) {
@@ -272,7 +281,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
           state.page.props[key as keyof PageProps] = value
         }
       }
-    },
+    }),
 
     // 快捷键移动元素调用
     moveComponent: (state, data: { direction: MoveDirection; amount: number; id: string }) => {
@@ -317,7 +326,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
       }
     },
     // 粘贴元素调用
-    pasteCopiedComponent: (state) => {
+    pasteCopiedComponent: setDirtyWrapper((state) => {
       if (state.copiedComponent) {
         const clone = cloneDeep(state.copiedComponent)
         clone.id = v4()
@@ -332,7 +341,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
           data: cloneDeep(clone)
         })
       }
-    },
+    }),
     // 依据接口初始化画布
     fetchWork(state, {data}: RespWorkData) {
       const {content, ...rest} = data
@@ -341,6 +350,9 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         state.page.props = content.props 
       }
       state.components = content.components
+    },
+    saveWork: (state) => {
+      state.isDirty = false
     }
   },
   actions: {
