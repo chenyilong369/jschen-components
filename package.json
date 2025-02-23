@@ -16,6 +16,7 @@
     "cropperjs": "^1.5.11",
     "hotkeys-js": "^3.13.9",
     "jschen-bricks": "^1.0.6",
+    "path-to-regexp": "^6.2.0",
     "lodash-es": "^4.17.21",
     "rgb-hex": "^3.0.0",
     "uuid": "^10.0.0",

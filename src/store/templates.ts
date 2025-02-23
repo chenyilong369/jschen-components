@@ -1,5 +1,7 @@
 import { Module } from "vuex";
 import { GlobalDataProps } from ".";
+import axios from "axios";
+import { RespListData } from "./respTypes";
 
 export interface TemplateProps {
   id: number;
@@ -77,17 +79,33 @@ export const testData: TemplateProps[] = [
 ]
 
 export interface TemplatesProps {
+  totalTemplates: number;
   data: TemplateProps[];
 }
 
 const templates: Module<TemplatesProps, GlobalDataProps> = {
   state: {
-    data: testData
+    data: testData,
+    totalTemplates: 0
   },
   getters: {
     getTemplateById: (state) => (id: number) => {
       return state.data.find(t => id === t.id)
     }
+  },
+  mutations: {
+    fetchTemplates(state, rawData: RespListData<TemplateProps>) {
+      const { count, list } = rawData.data
+      state.data = [ ...state.data, ...(list || []) ]
+      state.totalTemplates = count
+    },
+  },  
+  actions: {
+    fetchTemplates: (context) => {
+      return axios.get('/templates').then(resp => {
+        context.commit('fetchTemplates', resp)
+      })
+    } 
   }
 }
 

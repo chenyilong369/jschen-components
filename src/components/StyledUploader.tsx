@@ -28,7 +28,7 @@ export default defineComponent({
     }
     return () => (
       <Uploader
-        action="http://127.0.0.1:3000/api/utils/updateToCos"
+        action="/utils/updateToCos"
         class="styled-uploader"
         showUploadList={false}
         beforeUpload={commonUploadCheck}

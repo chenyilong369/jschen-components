@@ -1,12 +1,17 @@
-import {createStore} from 'vuex'
+import {ActionContext, createStore} from 'vuex'
 import templates, { TemplatesProps } from './templates';
+import { compile } from 'path-to-regexp'
 import user, {UserProps} from './user';
 import editor, {EditorProps} from './editor';
+import global, { GlobalStatus } from './global'
+import axios, { AxiosRequestConfig } from 'axios';
+import { forEach } from 'lodash-es';
 
 export interface GlobalDataProps {
   user: UserProps;
   templates: TemplatesProps;
   editor: EditorProps;
+  global: GlobalStatus;
 }
 
 export interface ActionPayload {
@@ -15,11 +20,34 @@ export interface ActionPayload {
   searchParams?: { [key: string]: any };
 }
 
-
+export function actionWrapper(url: string, commitName: string, config: AxiosRequestConfig = { method: 'get'}) {
+  return async (context: ActionContext<any, any>, payload: ActionPayload = {}) => {
+    const { urlParams, data, searchParams } = payload
+    const newConfig = { ...config, data, opName: commitName }
+    let newURL = url
+    if (urlParams) {
+      const toPath = compile(url, { encode: encodeURIComponent })
+      newURL = toPath(urlParams)
+      console.log(newURL)
+    }
+    if (searchParams) {
+      const search = new URLSearchParams()
+      forEach(searchParams, (value, key) => {
+        search.append(key, value)
+      })
+      newURL += '?' + search.toString()
+      // 另外一种方式
+      // newURL += '?' + objToQueryString(searchParams)
+    }
+    const resp = await axios(newURL, newConfig)
+    context.commit(commitName, { payload ,...resp.data})
+    return resp.data
+  }
+}
 
 const store = createStore<GlobalDataProps>({
   modules: {
-    templates,user,editor
+    templates,user,editor,global
   },
 })
 

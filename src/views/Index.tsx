@@ -19,7 +19,6 @@ export default defineComponent({
         {
           withHeader.value ? (
             <div class="homepage-container">
-              <l-text text="sdsdsdsdsdsd" tag="h2"/>
               <a-layout style={{ background: '#fff' }}>
                 <a-layout-header class="header">
                   <router-link to="/">

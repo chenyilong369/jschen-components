@@ -1,6 +1,6 @@
 import { defineComponent, PropType } from 'vue'
 import { useStore } from 'vuex'
-import { useRouter } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { UserProps } from '../store/user'
 export default defineComponent({
@@ -14,10 +14,6 @@ export default defineComponent({
   setup(props) {
     const store = useStore<UserProps>()
     const router = useRouter()
-    const login = () => {
-      store.commit('login')
-      message.success('登录成功', 2)
-    }
     const logout = () => {
       store.commit('logout')
       message.success('登出成功', 2)
@@ -29,9 +25,11 @@ export default defineComponent({
       <>
         {
           !props.user?.isLogin ? (
-            <a-button type="primary" class="user-profile-component" onClick={login}>
-              登录
-            </a-button>
+            <RouterLink to="/login">
+              <a-button type="primary" class="user-profile-component">
+                登录
+              </a-button>
+            </RouterLink>
           ) : (
             <a-dropdown-button class="user-profile-component" v-slots={{
               overlay: () => (
@@ -40,11 +38,11 @@ export default defineComponent({
                 </a-menu>
               )
             }}>
-              <router-link to="/setting">{ props.user.userName }</router-link>
+              <router-link to="/setting">{props.user.data && props.user.data.nickName}</router-link>
             </a-dropdown-button>
           )
         }
       </>
-    )  
+    )
   }
 })
