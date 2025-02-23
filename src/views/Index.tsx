@@ -23,7 +23,7 @@ export default defineComponent({
                 <a-layout-header class="header">
                   <router-link to="/">
                     <div class="page-title">
-                      JSCHEN乐高
+                    拖拖艺术
                     </div>
                   </router-link>
                   <UserProfile user={user.value} />

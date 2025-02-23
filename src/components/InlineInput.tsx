@@ -3,7 +3,7 @@ import useKeyPress from '../hooks/useKeyPress'
 import useClickOutside from '../hooks/useClickOutside'
 import '@/styles/components/InlineInput.scss'
 export default defineComponent({
-  name: 'inline-edit',
+  name: 'inline-input',
   props: {
     value: {
       type: String,
@@ -38,6 +38,7 @@ export default defineComponent({
     })
     watch(isOutside, (newValue) => {
       if (!validateCheck.value) {
+        isOutside.value = false
         return
       }
       if (newValue && isEditing.value) {

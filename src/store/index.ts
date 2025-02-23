@@ -6,6 +6,7 @@ import editor, {EditorProps} from './editor';
 import global, { GlobalStatus } from './global'
 import axios, { AxiosRequestConfig } from 'axios';
 import { forEach } from 'lodash-es';
+import { message } from 'ant-design-vue';
 
 export interface GlobalDataProps {
   user: UserProps;
@@ -18,11 +19,12 @@ export interface ActionPayload {
   urlParams?: { [key: string]: any };
   data?: any;
   searchParams?: { [key: string]: any };
+  successMessage?: string;
 }
 
 export function actionWrapper(url: string, commitName: string, config: AxiosRequestConfig = { method: 'get'}) {
   return async (context: ActionContext<any, any>, payload: ActionPayload = {}) => {
-    const { urlParams, data, searchParams } = payload
+    const { urlParams, data, searchParams, successMessage } = payload
     const newConfig = { ...config, data, opName: commitName }
     let newURL = url
     if (urlParams) {
@@ -40,6 +42,7 @@ export function actionWrapper(url: string, commitName: string, config: AxiosRequ
       // newURL += '?' + objToQueryString(searchParams)
     }
     const resp = await axios(newURL, newConfig)
+    successMessage && message.success(successMessage)
     context.commit(commitName, { payload ,...resp.data})
     return resp.data
   }

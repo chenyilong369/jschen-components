@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, resolveComponent, ref, CSSProperties } from 'vue'
+import { defineComponent, computed, h, resolveComponent, ref, CSSProperties, onMounted } from 'vue'
 import EditWrapper from '../components/EditWrapper'
 import ComponentsList from '../components/ComponentsList';
 import defaultTextTemplates from '../defaultTemplates'
@@ -14,6 +14,9 @@ import PropsTable from '@/components/PropsTable';
 import { pickBy } from 'lodash-es';
 import initHotKeys from '@/plugins/hotKeys';
 import initContextMenu from '@/plugins/initContext';
+import { useRoute } from 'vue-router';
+import UserProfile from '@/components/UserProfile';
+import InlineInput from '@/components/InlineInput';
 
 export type TabType = 'component' | 'layer' | 'page'
 export default defineComponent({
@@ -23,17 +26,26 @@ export default defineComponent({
     EditGroup,
     ComponentsList,
     HistoryArea,
+    InlineInput,
     EditWrapper
   },
   setup() {
     initHotKeys()
     initContextMenu()
+    const route = useRoute()
+    const currentWorkId = route.params.id
     const store = useStore<GlobalDataProps>();
     const components = computed(() => store.state.editor.components)
     const page = computed(() => store.state.editor.page)
     const componentList = computed(() => defaultTextTemplates)
+    const userInfo = computed(() => store.state.user)
     const activePanel = ref<TabType>('component')
     const currentElement = computed<ComponentData | null>(() => store.getters.getCurrentElement)
+    onMounted(() => {
+      if (currentWorkId) {
+        store.dispatch('fetchWork', { urlParams: { id: currentWorkId } })
+      }
+    })
     const addItem = (component: ComponentData) => {
       store.commit('addComponent', component)
     }
@@ -49,6 +61,22 @@ export default defineComponent({
     const pageChange = (e: any) => {
       store.commit('updatePage', e)
     }
+    const titleChange = (newTitle: string) => {
+      store.commit('updatePage', { key: 'title', value: newTitle, isRoot: true })
+    }
+
+    const saveWork = () => {
+      const { title, props } = page.value
+      const payload = {
+        title,
+        content: {
+          props,
+          components: components.value
+        }
+      }
+      store.dispatch('saveWork', { data: payload, urlParams: { id: currentWorkId }, successMessage: '保存成功' })
+    }
+
     const updatePosition = (data: { left: number; top: number; id: string }) => {
       const { id } = data
       const updatedData = pickBy<number>(data, (v, k) => k !== 'id')
@@ -58,6 +86,44 @@ export default defineComponent({
     }
     return () => (
       <div class="editor-content">
+
+        <a-layout>
+          <a-layout-header class="header">
+            <div class="page-title">
+              <router-link to="/">
+                <div class="page-title">
+                  拖拖艺术
+                </div>
+              </router-link>
+              <InlineInput value={page.value.title || ''} onChange={titleChange} >
+                {{
+                  default: ({ text }: any) => <span>{text}</span>
+                }}
+              </InlineInput>
+            </div>
+            <a-menu
+              selectable={false}
+              theme="dark"
+              mode="horizontal"
+              style={{ lineHeight: '64px' }}
+            >
+              <a-menu-item key="1">
+                <a-button type="primary">预览和设置</a-button>
+              </a-menu-item>
+              <a-menu-item key="2">
+                <a-button type="primary" onClick={saveWork}>保存</a-button>
+              </a-menu-item>
+              <a-menu-item key="3">
+                <a-button type="primary" >发布</a-button>
+              </a-menu-item>
+              <a-menu-item key="4">
+                <UserProfile user={userInfo.value}></UserProfile>
+              </a-menu-item>
+            </a-menu>
+
+          </a-layout-header>
+        </a-layout>
+
         <a-layout class="content-row">
           <a-layout-sider width="300" style="background: #fff">
             <div class="sidebar-container">

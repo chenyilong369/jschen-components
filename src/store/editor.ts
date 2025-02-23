@@ -1,10 +1,11 @@
-import store, { GlobalDataProps } from ".";
+import store, { actionWrapper, GlobalDataProps } from ".";
 import { AllComponentProps, imageDefaultProps, textDefaultProps } from '../defaultProps'
 import { Module } from "vuex";
 import { v4 } from 'uuid'
 import { message } from "ant-design-vue";
 import { cloneDeep } from "lodash-es";
 import { insertAt } from "@/utils/helper";
+import { RespWorkData } from "./respTypes";
 export type MoveDirection = 'Up' | 'Down' | 'Left' | 'Right'
 export type HistoryType = 'add' | 'delete' | 'modify'
 
@@ -331,7 +332,24 @@ const editor: Module<EditorProps, GlobalDataProps> = {
           data: cloneDeep(clone)
         })
       }
+    },
+    // 依据接口初始化画布
+    fetchWork(state, {data}: RespWorkData) {
+      const {content, ...rest} = data
+      state.page = {...state.page, ...rest}
+      if (content.props) {
+        state.page.props = content.props 
+      }
+      state.components = content.components
     }
+  },
+  actions: {
+    fetchWork: actionWrapper('/works/:id', 'fetchWork'),
+    saveWork: actionWrapper('/works/:id', 'saveWork', { method: 'patch' }),
+    publishWork: actionWrapper('/works/publish/:id', 'publishWork', { method: 'post'}),
+    fetchChannels: actionWrapper('/channel/getWorkChannels/:id', 'fetchChannels'),
+    createChannel: actionWrapper('/channel/', 'createChannel', { method: 'post'}),
+    deleteChannel: actionWrapper('/channel/:id', 'deleteChannel', { method: 'delete'})
   },
   getters: {
     getCurrentElement: (state) => {
@@ -347,9 +365,6 @@ const editor: Module<EditorProps, GlobalDataProps> = {
       return false
     },
     checkRedoDisable: (state) => {
-      // 1 no history item
-      // 2 move to the last item
-      // 3 never undo before
       if (state.histories.length === 0 ||
         state.historyIndex === state.histories.length ||
         state.historyIndex === -1) {
