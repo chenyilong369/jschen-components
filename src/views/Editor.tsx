@@ -17,6 +17,8 @@ import initContextMenu from '@/plugins/initContext';
 import { useRoute } from 'vue-router';
 import UserProfile from '@/components/UserProfile';
 import InlineInput from '@/components/InlineInput';
+import useSaveWork from '@/hooks/useSaveWork';
+import html2canvas from 'html2canvas';
 
 export type TabType = 'component' | 'layer' | 'page'
 export default defineComponent({
@@ -32,39 +34,14 @@ export default defineComponent({
   setup() {
     initHotKeys()
     initContextMenu()
-    const route = useRoute()
-    const currentWorkId = route.params.id
     const store = useStore<GlobalDataProps>();
-    const isDirty = computed(() => store.state.editor.isDirty)
     const components = computed(() => store.state.editor.components)
     const page = computed(() => store.state.editor.page)
     const componentList = computed(() => defaultTextTemplates)
     const userInfo = computed(() => store.state.user)
     const activePanel = ref<TabType>('component')
     const currentElement = computed<ComponentData | null>(() => store.getters.getCurrentElement)
-    const saveWork = (hiddenMessage = false) => {
-      const { title, props } = page.value
-      const payload = {
-        title,
-        content: {
-          props,
-          components: components.value
-        }
-      }
-      store.dispatch('saveWork', { data: payload, urlParams: { id: currentWorkId }, successMessage: hiddenMessage ? '' : '保存成功' })
-    }
-    let timer = 0;
-    onMounted(() => {
-      if (currentWorkId) {
-        store.dispatch('fetchWork', { urlParams: { id: currentWorkId } })
-      }
-      timer = setInterval(() => {
-        isDirty.value && saveWork(true)
-      }, 2000)
-    })
-    onUnmounted(() => {
-      clearInterval(timer)
-    })
+    const { saveWork, saveIsLoading } = useSaveWork()
     const addItem = (component: ComponentData) => {
       store.commit('addComponent', component)
     }
@@ -91,6 +68,15 @@ export default defineComponent({
       const valuesArr = Object.values(updatedData).map(v => v + 'px')
       store.commit('updateComponent', { key: keysArr, value: valuesArr, id })
     }
+
+    const publish = () => {
+      const el = document.getElementById('canvas-area') as HTMLElement
+      html2canvas(el, {width: 375, useCORS: true}).then(canvas => {
+        const image = document.getElementById('test-image') as HTMLImageElement
+        image.src = canvas.toDataURL()
+      })
+    }
+
     return () => (
       <div class="editor-content">
 
@@ -118,10 +104,10 @@ export default defineComponent({
                 <a-button type="primary">预览和设置</a-button>
               </a-menu-item>
               <a-menu-item key="2">
-                <a-button type="primary" onClick={saveWork}>保存</a-button>
+                <a-button type="primary" onClick={saveWork} loading={saveIsLoading.value}>保存</a-button>
               </a-menu-item>
               <a-menu-item key="3">
-                <a-button type="primary" >发布</a-button>
+                <a-button type="primary" onClcik={publish}>发布</a-button>
               </a-menu-item>
               <a-menu-item key="4">
                 <UserProfile user={userInfo.value}></UserProfile>
