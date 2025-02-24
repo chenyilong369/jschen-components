@@ -214,7 +214,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
               updateComponent.props[keyName] = value[index]
             })
           } else if (typeof key === 'string' && typeof value === 'string') {
-            updateComponent.props[key] = value.toString()
+            updateComponent.props[key] = value
           }
 
         }

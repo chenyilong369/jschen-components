@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, resolveComponent, ref, CSSProperties, onMounted, onUnmounted } from 'vue'
+import { defineComponent, computed, h, resolveComponent, ref, CSSProperties, onMounted, onUnmounted, nextTick } from 'vue'
 import EditWrapper from '../components/EditWrapper'
 import ComponentsList from '../components/ComponentsList';
 import defaultTextTemplates from '../defaultTemplates'
@@ -39,6 +39,7 @@ export default defineComponent({
     const page = computed(() => store.state.editor.page)
     const componentList = computed(() => defaultTextTemplates)
     const userInfo = computed(() => store.state.user)
+    const canvasFix = ref(false) // html2canvas 不支持 boxShadow
     const activePanel = ref<TabType>('component')
     const currentElement = computed<ComponentData | null>(() => store.getters.getCurrentElement)
     const { saveWork, saveIsLoading } = useSaveWork()
@@ -69,11 +70,15 @@ export default defineComponent({
       store.commit('updateComponent', { key: keysArr, value: valuesArr, id })
     }
 
-    const publish = () => {
+    const publish = async () => {
+      store.commit('setActive', '')
       const el = document.getElementById('canvas-area') as HTMLElement
-      html2canvas(el, {width: 375, useCORS: true}).then(canvas => {
+      canvasFix.value = true
+      await nextTick()
+      html2canvas(el, { width: 375, useCORS: true }).then(canvas => {
         const image = document.getElementById('test-image') as HTMLImageElement
         image.src = canvas.toDataURL()
+        canvasFix.value = false
       })
     }
 
@@ -98,16 +103,16 @@ export default defineComponent({
               selectable={false}
               theme="dark"
               mode="horizontal"
-              style={{ lineHeight: '64px' }}
+              style={{ lineHeight: '64px', width: '520px' }}
             >
               <a-menu-item key="1">
                 <a-button type="primary">预览和设置</a-button>
               </a-menu-item>
               <a-menu-item key="2">
-                <a-button type="primary" onClick={saveWork} loading={saveIsLoading.value}>保存</a-button>
+                <a-button type="primary" onClick={() => saveWork()} loading={saveIsLoading.value}>保存</a-button>
               </a-menu-item>
               <a-menu-item key="3">
-                <a-button type="primary" onClcik={publish}>发布</a-button>
+                <a-button type="primary" onClick={publish}>发布</a-button>
               </a-menu-item>
               <a-menu-item key="4">
                 <UserProfile user={userInfo.value}></UserProfile>
@@ -130,7 +135,7 @@ export default defineComponent({
             <a-layout-content class="preview-container">
               <p>画布区域</p>
               <HistoryArea></HistoryArea>
-              <div class="preview-list" id="canvas-area">
+              <div class={{ "preview-list": true, "canvas-fix": canvasFix.value }} id="canvas-area">
                 <div class="body-container" style={page.value.props as CSSProperties}>
                   {
                     components.value?.map(item => (
