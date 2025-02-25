@@ -75,7 +75,7 @@ export default defineComponent({
       const el = document.getElementById('canvas-area') as HTMLElement
       canvasFix.value = true
       await nextTick()
-      html2canvas(el, { width: 375, useCORS: true }).then(canvas => {
+      html2canvas(el, { width: 375, useCORS: true, scale: 1 }).then(canvas => {
         const image = document.getElementById('test-image') as HTMLImageElement
         image.src = canvas.toDataURL()
         canvasFix.value = false

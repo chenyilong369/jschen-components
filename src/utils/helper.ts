@@ -1,4 +1,5 @@
 import { message } from "ant-design-vue";
+import html2canvas from "html2canvas";
 interface CheckCondition {
   format?: string[];
   // 使用多少 M 为单位
@@ -66,3 +67,16 @@ export const insertAt = (arr: any[], index: number, newItem: any) => {
     ...arr.slice(index)
   ]
 }
+
+function getCanvasBlob(canvas: HTMLCanvasElement) {
+  return new Promise<Blob | null>(resolve => {
+    canvas.toBlob(blob => {
+      resolve(blob)
+    })
+  })
+}
+
+export async function takeScreenshotAndUpload(ele: HTMLElement) {
+  const canvas = await html2canvas(ele, { width: 375, useCORS: true, scale: 1 })
+  
+} 
