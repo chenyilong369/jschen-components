@@ -18,7 +18,7 @@ import { useRoute } from 'vue-router';
 import UserProfile from '@/components/UserProfile';
 import InlineInput from '@/components/InlineInput';
 import useSaveWork from '@/hooks/useSaveWork';
-import html2canvas from 'html2canvas';
+import usePublishWork from '@/hooks/usePublishWork';
 
 export type TabType = 'component' | 'layer' | 'page'
 export default defineComponent({
@@ -34,6 +34,8 @@ export default defineComponent({
   setup() {
     initHotKeys()
     initContextMenu()
+    const route = useRoute()
+    const currentWorkId = route.params.id
     const store = useStore<GlobalDataProps>();
     const components = computed(() => store.state.editor.components)
     const page = computed(() => store.state.editor.page)
@@ -43,6 +45,7 @@ export default defineComponent({
     const activePanel = ref<TabType>('component')
     const currentElement = computed<ComponentData | null>(() => store.getters.getCurrentElement)
     const { saveWork, saveIsLoading } = useSaveWork()
+    const { isPublishing, publishWork } = usePublishWork()
     const addItem = (component: ComponentData) => {
       store.commit('addComponent', component)
     }
@@ -71,15 +74,18 @@ export default defineComponent({
     }
 
     const publish = async () => {
+      isPublishing.value = true
       store.commit('setActive', '')
       const el = document.getElementById('canvas-area') as HTMLElement
       canvasFix.value = true
       await nextTick()
-      html2canvas(el, { width: 375, useCORS: true, scale: 1 }).then(canvas => {
-        const image = document.getElementById('test-image') as HTMLImageElement
-        image.src = canvas.toDataURL()
+      try {
+        await publishWork(el)
+      } catch (e) {
+        console.error(e)
+      } finally {
         canvasFix.value = false
-      })
+      }
     }
 
     return () => (
@@ -109,10 +115,10 @@ export default defineComponent({
                 <a-button type="primary">预览和设置</a-button>
               </a-menu-item>
               <a-menu-item key="2">
-                <a-button type="primary" onClick={() => saveWork()} loading={saveIsLoading.value}>保存</a-button>
+                <a-button type="primary" onClick={saveWork} loading={saveIsLoading.value}>保存</a-button>
               </a-menu-item>
               <a-menu-item key="3">
-                <a-button type="primary" onClick={publish}>发布</a-button>
+                <a-button type="primary" onClick={publish} loading={isPublishing.value}>发布</a-button>
               </a-menu-item>
               <a-menu-item key="4">
                 <UserProfile user={userInfo.value}></UserProfile>

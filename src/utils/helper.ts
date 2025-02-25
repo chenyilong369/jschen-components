@@ -1,4 +1,7 @@
+import { RespUploadData } from "@/store/respTypes";
 import { message } from "ant-design-vue";
+import axios from "axios";
+import QRCode from 'qrcode'
 import html2canvas from "html2canvas";
 interface CheckCondition {
   format?: string[];
@@ -68,6 +71,18 @@ export const insertAt = (arr: any[], index: number, newItem: any) => {
   ]
 }
 
+export async function uploadFile<R = any>(file: Blob, url = "/utils/updateToCos", fileName = "screenshot") {
+  const newFile = file instanceof File ? file : new File([file], fileName)
+  const formData = new FormData()
+  formData.append(newFile.name, newFile)
+  const { data } = await axios.post<R>(url, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    },
+  })
+  return data
+}
+
 function getCanvasBlob(canvas: HTMLCanvasElement) {
   return new Promise<Blob | null>(resolve => {
     canvas.toBlob(blob => {
@@ -78,5 +93,14 @@ function getCanvasBlob(canvas: HTMLCanvasElement) {
 
 export async function takeScreenshotAndUpload(ele: HTMLElement) {
   const canvas = await html2canvas(ele, { width: 375, useCORS: true, scale: 1 })
-  
-} 
+  const canvasBolb = await getCanvasBlob(canvas)
+  if (canvasBolb) {
+    const data = uploadFile<RespUploadData>(canvasBolb)
+    return data
+  }
+}
+
+export function generateQRCode(id: string, url: string, width = 100) {
+  const el = document.getElementById(id) as HTMLElement
+  return QRCode.toCanvas(el, url, { width })
+}

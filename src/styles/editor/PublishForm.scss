@@ -1,0 +1,32 @@
+.left-col img {
+  width: 80%;
+}
+.right-col img {
+  width: 80px;
+}
+.left-gap {
+  padding-left: 5px;
+  height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.delete-area {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+}
+.channel-item {
+  padding: 10px 0;
+  border-bottom: 1px solid #efefef;
+  position: relative;
+}
+.barcode-container {
+  height: 80px;
+  width: 80px;
+}
+.template-submit {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}

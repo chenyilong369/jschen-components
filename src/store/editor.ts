@@ -5,7 +5,7 @@ import { v4 } from 'uuid'
 import { message } from "ant-design-vue";
 import { cloneDeep } from "lodash-es";
 import { insertAt } from "@/utils/helper";
-import { RespWorkData } from "./respTypes";
+import { RespWorkData, RespListData, RespData } from "./respTypes";
 export type MoveDirection = 'Up' | 'Down' | 'Left' | 'Right'
 export type HistoryType = 'add' | 'delete' | 'modify'
 
@@ -27,6 +27,7 @@ export interface EditorProps {
   cachedOldValues: any;
   maxHistoryNumber: number;
   isDirty: boolean; // 数据是否有修改
+  channels: ChannelProps[];
 }
 
 export interface UpdateComponentData {
@@ -34,6 +35,13 @@ export interface UpdateComponentData {
   value: string;
   id: string;
   isRoot?: boolean;
+}
+
+export interface ChannelProps {
+  id: string;
+  name: string;
+  workId: number;
+  status: number;
 }
 
 export interface ComponentData {
@@ -114,8 +122,8 @@ const modifyHistory = (state: EditorProps, history: HistoryProps, type: 'undo' |
   }
 }
 
-const debounceChange = (callabck: (...args: any) => void, timeout=1000) => {
-  let timer = 0
+const debounceChange = (callabck: (...args: any) => void, timeout = 1000) => {
+  let timer: any = 0
   return (...args: any) => {
     clearTimeout(timer)
     timer = setTimeout(() => {
@@ -157,7 +165,8 @@ const editor: Module<EditorProps, GlobalDataProps> = {
     historyIndex: -1,
     cachedOldValues: null,
     maxHistoryNumber: 5,
-    isDirty: false
+    isDirty: false,
+    channels: []
   },
   mutations: {
     // 重置画布
@@ -208,7 +217,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
           if (!state.cachedOldValues) {
             state.cachedOldValues = oldValue
           }
-          pushHistoryDebounce(state, {key, value, id}, oldValue)
+          pushHistoryDebounce(state, { key, value, id }, oldValue)
           if (Array.isArray(key) && Array.isArray(value)) {
             key.forEach((keyName: keyof AllComponentProps, index) => {
               updateComponent.props[keyName] = value[index]
@@ -343,25 +352,37 @@ const editor: Module<EditorProps, GlobalDataProps> = {
       }
     }),
     // 依据接口初始化画布
-    fetchWork(state, {data}: RespWorkData) {
-      const {content, ...rest} = data
-      state.page = {...state.page, ...rest}
+    fetchWork(state, { data }: RespWorkData) {
+      const { content, ...rest } = data
+      state.page = { ...state.page, ...rest }
       if (content.props) {
-        state.page.props = content.props 
+        state.page.props = content.props
       }
       state.components = content.components
     },
     saveWork: (state) => {
       state.isDirty = false
+    },
+    fetchChannels: (state, { data }: RespListData<ChannelProps>) => {
+      state.channels = data.list
+    },
+    createChannels: (state, { data }: RespData<ChannelProps>) => {
+      state.channels = [...state.channels, data]
+    },
+    deleteChannel: (state, {payload}: RespData<any>) => {
+      if (payload && payload.urlParams) {
+        const { urlParams } = payload
+        state.channels = state.channels.filter(channel => channel.id !== urlParams.id)
+      }
     }
   },
   actions: {
     fetchWork: actionWrapper('/works/:id', 'fetchWork'),
     saveWork: actionWrapper('/works/:id', 'saveWork', { method: 'patch' }),
-    publishWork: actionWrapper('/works/publish/:id', 'publishWork', { method: 'post'}),
+    publishWork: actionWrapper('/works/publish/:id', 'publishWork', { method: 'post' }),
     fetchChannels: actionWrapper('/channel/getWorkChannels/:id', 'fetchChannels'),
-    createChannel: actionWrapper('/channel/', 'createChannel', { method: 'post'}),
-    deleteChannel: actionWrapper('/channel/:id', 'deleteChannel', { method: 'delete'})
+    createChannel: actionWrapper('/channel/', 'createChannel', { method: 'post' }),
+    deleteChannel: actionWrapper('/channel/:id', 'deleteChannel', { method: 'delete' })
   },
   getters: {
     getCurrentElement: (state) => {
