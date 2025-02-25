@@ -19,7 +19,7 @@ function usePublishWork() {
       const resp = await takeScreenshotAndUpload(el)
       if (resp) {
         store.commit('updatePage', { key: 'coverImg', value: resp.data.url, isRoot: true })
-        await saveWork()
+        await saveWork(true)
         await store.dispatch('publishWork', { urlParams: { id: currentWorkId } })
         await store.dispatch('fetchChannels', { urlParams: { id: currentWorkId } })
         if (channels.value.length === 0) {

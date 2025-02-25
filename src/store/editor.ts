@@ -366,7 +366,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
     fetchChannels: (state, { data }: RespListData<ChannelProps>) => {
       state.channels = data.list
     },
-    createChannels: (state, { data }: RespData<ChannelProps>) => {
+    createChannel: (state, { data }: RespData<ChannelProps>) => {
       state.channels = [...state.channels, data]
     },
     deleteChannel: (state, {payload}: RespData<any>) => {

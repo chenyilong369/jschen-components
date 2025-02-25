@@ -104,3 +104,28 @@ export function generateQRCode(id: string, url: string, width = 100) {
   const el = document.getElementById(id) as HTMLElement
   return QRCode.toCanvas(el, url, { width })
 }
+
+// 实现一个点击复制功能
+export function copyToClipboard(text: string) {
+  const textarea = document.createElement('textarea')
+  textarea.value = text
+
+  textarea.style.position = 'fixed'
+  textarea.style.top = '0'
+  textarea.style.left = '-9999px'
+
+  document.body.appendChild(textarea)
+  textarea.select()
+
+  try {
+    return document.execCommand('copy')
+  } catch (e) {
+    console.warn('copy fail')
+  } finally {
+    document.body.removeChild(textarea)
+  }
+}
+
+export function timeout(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}

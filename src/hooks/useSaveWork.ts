@@ -11,7 +11,6 @@ const useSaveWork = (disableSiderEffect = false) => {
   const components = computed(() => store.state.editor.components)
   const page = computed(() => store.state.editor.page)
   const isDirty = computed(() => store.state.editor.isDirty)
-  let timer: any = 0;
 
   const saveWork = (hiddenMessage = false) => {
     const { title, props, coverImg } = page.value
@@ -26,7 +25,9 @@ const useSaveWork = (disableSiderEffect = false) => {
     store.dispatch('saveWork', { data: payload, urlParams: { id: currentWorkId }, successMessage: hiddenMessage ? '' : '保存成功' })
   }
 
+
   if (!disableSiderEffect) {
+    let timer: any = 0;
     onMounted(() => {
       if (currentWorkId) {
         store.dispatch('fetchWork', { urlParams: { id: currentWorkId } })
@@ -40,6 +41,7 @@ const useSaveWork = (disableSiderEffect = false) => {
     })
 
     onBeforeRouteLeave((to, from, next) => {
+      console.log(isDirty.value)
       if (isDirty.value) {
         Modal.confirm({
           okText: '保存',

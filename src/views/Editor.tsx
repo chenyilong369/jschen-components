@@ -19,6 +19,8 @@ import UserProfile from '@/components/UserProfile';
 import InlineInput from '@/components/InlineInput';
 import useSaveWork from '@/hooks/useSaveWork';
 import usePublishWork from '@/hooks/usePublishWork';
+import PublishForm from './editor/PublishForm';
+import { copyToClipboard } from '@/utils/helper';
 
 export type TabType = 'component' | 'layer' | 'page'
 export default defineComponent({
@@ -36,6 +38,7 @@ export default defineComponent({
     initContextMenu()
     const route = useRoute()
     const currentWorkId = route.params.id
+    const showPublishForm = ref(false)
     const store = useStore<GlobalDataProps>();
     const components = computed(() => store.state.editor.components)
     const page = computed(() => store.state.editor.page)
@@ -74,13 +77,13 @@ export default defineComponent({
     }
 
     const publish = async () => {
-      isPublishing.value = true
       store.commit('setActive', '')
       const el = document.getElementById('canvas-area') as HTMLElement
       canvasFix.value = true
       await nextTick()
       try {
         await publishWork(el)
+        showPublishForm.value = true
       } catch (e) {
         console.error(e)
       } finally {
@@ -90,7 +93,15 @@ export default defineComponent({
 
     return () => (
       <div class="editor-content">
-
+        <a-modal
+          title="发布成功"
+          open={showPublishForm.value}
+          onChange={(e: boolean) => showPublishForm.value = e}
+          width="700px"
+          footer={null}
+        >
+          <PublishForm/>
+        </a-modal>
         <a-layout>
           <a-layout-header class="header">
             <div class="page-title">

@@ -121,7 +121,7 @@ export default defineComponent({
                         </a-row>
                       </a-col>
                       <div class="delete-area">
-                        <a-button type="danger" size="small" onClick={this.deleteChannel(channel.id)} disabled={this.deleteDisabled}>删除渠道</a-button>
+                        <a-button danger onClick={() => this.deleteChannel(channel.id)} disabled={this.deleteDisabled}>删除渠道</a-button>
                       </div>
                     </a-row>
                   ))
