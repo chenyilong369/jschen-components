@@ -280,7 +280,6 @@ const editor: Module<EditorProps, GlobalDataProps> = {
       if (isRoot) {
         state.page[key as keyof PageData] = value
       } else if (isSetting) {
-        debugger
         state.page.setting = {
           ...state.page.setting,
           [key]: value
@@ -357,6 +356,9 @@ const editor: Module<EditorProps, GlobalDataProps> = {
       state.page = { ...state.page, ...rest }
       if (content.props) {
         state.page.props = content.props
+      }
+      if (content.setting) {
+        state.page.setting = content.setting
       }
       state.components = content.components
     },

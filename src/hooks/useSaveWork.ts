@@ -13,15 +13,18 @@ const useSaveWork = (disableSiderEffect = false) => {
   const isDirty = computed(() => store.state.editor.isDirty)
 
   const saveWork = (hiddenMessage = false) => {
-    const { title, props, coverImg } = page.value
+    const { title, props, coverImg, desc, setting } = page.value
     const payload = {
       title,
       coverImg,
+      desc,
       content: {
+        components: components.value,
         props,
-        components: components.value
+        setting
       }
     }
+    console.log(payload)
     store.dispatch('saveWork', { data: payload, urlParams: { id: currentWorkId }, successMessage: hiddenMessage ? '' : '保存成功' })
   }
 

@@ -1,4 +1,4 @@
-import { computed, defineComponent, PropType, reactive, ref } from "vue";
+import { computed, defineComponent, PropType, reactive, ref, watch } from "vue";
 import axios from 'axios'
 import { v4 } from "uuid";
 import '@/styles/components/Uploader.scss'
@@ -55,6 +55,10 @@ export default defineComponent({
     showUploadList: {
       type: Boolean,
       default: true
+    },
+    initUploaded: {
+      type: Object,
+      default: null
     }
   },
   components: {
@@ -70,6 +74,8 @@ export default defineComponent({
     const isUploading = computed(() => {
       return filesList.value.some(item => item.status === 'loading')
     })
+    const useInitData = ref(false)
+    const initData = ref(props.initUploaded)
 
     const lastFileData = computed(() => {
       const lastFile = last(filesList.value)
@@ -196,7 +202,7 @@ export default defineComponent({
       beforeUploadCheck(target.files)
     }
 
-    const getUploaderButton = () => {
+    const getUploaderButton = computed(() => {
       if (isUploading.value) {
         return slots.loading ? slots.loading({
           loadedPresent: progressNumber.value
@@ -204,11 +210,19 @@ export default defineComponent({
       } else if (lastFileData.value && lastFileData.value.loaded) {
         return slots.uploaded ? slots.uploaded({
           uploadedData: lastFileData.value.data
-        },) : <button>点击上传</button>
+        }) : <button>点击上传</button>
       } else {
         return slots.default ? slots.default() : <button>点击上传</button>
       }
-    }
+    })
+
+    watch(() => props.initUploaded, (newValue) => {
+      if (newValue) {
+        useInitData.value = true
+        initData.value = newValue
+        console.log(newValue)
+      }
+    })
 
     return {
       triggerUpload,
@@ -220,7 +234,9 @@ export default defineComponent({
       fileInput,
       uploadFiles,
       filesList,
-      removeFile
+      removeFile,
+      useInitData,
+      initData
     }
   },
   render() {
@@ -239,7 +255,10 @@ export default defineComponent({
       <div class="file-upload">
         <div onClick={this.triggerUpload} class={{ "upload-area": true, "is-dragover": this.$props.drag && this.isDragOver }} {...events}>
           {
-            this.getUploaderButton()
+            this.useInitData ? (
+              this.$slots.uploaded ? this.$slots.uploaded({
+              uploadedData: this.initData
+            }) : <button>点击上传</button>) : this.getUploaderButton
           }
         </div>
         <input ref="fileInput" onChange={(e) => this.handleChangeFiles(e)} type="file" style={{ display: 'none' }} />

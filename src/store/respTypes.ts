@@ -14,6 +14,7 @@ export interface WorkData extends Omit<PageData, 'props'> {
   content: {
     components: ComponentData[];
     props?: PageProps;
+    setting?: any;
   };
 }
 export interface UploadData {

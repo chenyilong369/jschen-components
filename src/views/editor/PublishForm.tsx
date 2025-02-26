@@ -94,7 +94,7 @@ export default defineComponent({
           <a-col span={16} class="right-col">
             <a-row>
               <a-col span={6}>
-                <img src="http://vue-maker.oss-cn-hangzhou.aliyuncs.com/vue-marker/5f79389d4737571e2e1dc7cb.png" alt={this.page.title} />
+                <img src={this.page.setting?.shareImg ? this.page.setting.shareImg : 'http://vue-maker.oss-cn-hangzhou.aliyuncs.com/vue-marker/5f79389d4737571e2e1dc7cb.png'} alt={this.page.title} />
               </a-col>
               <a-col span={18} class="left-gap">
                 <h4>{this.page.title}</h4>

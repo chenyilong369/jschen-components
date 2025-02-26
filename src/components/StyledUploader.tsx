@@ -13,6 +13,10 @@ export default defineComponent({
     showUploaded: {
       type: Boolean,
       default: false
+    },
+    uploaded: {
+      type: Object,
+      default: null
     }
   },
   components: {
@@ -31,6 +35,7 @@ export default defineComponent({
         action="/utils/updateToCos"
         class="styled-uploader"
         showUploadList={false}
+        initUploaded={props.uploaded}
         beforeUpload={commonUploadCheck}
         onSuccess={(data: { resp: any }) => handleUploadSuccess(data)}
       >
@@ -48,16 +53,17 @@ export default defineComponent({
                 <h4>{props.text}</h4>
               </div>
             ),
-            uploaded: (dataProps: { successData: { url: string } }) => (
+            uploaded: ({uploadedData}: { uploadedData: {data: { url: string } }}) => (
               <div class="uploader-container">
                 {
-                  props.showUploaded ? <img src={ dataProps.successData.url } /> : (
+                  props.showUploaded ? <img src={ uploadedData.data.url } /> : (
                     <>
                       <FileImageOutlined />
                       <h4>{props.text}</h4>
                     </>
                   )
                 }
+                {/* {JSON.stringify(uploadedData.successData.url)} */}
               </div>
             )
           }

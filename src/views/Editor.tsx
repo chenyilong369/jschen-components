@@ -109,7 +109,7 @@ export default defineComponent({
         >
           <PublishForm/>
         </a-modal>
-        <PreviewForm visible={showPreviewForm.value} />
+        <PreviewForm visible={showPreviewForm.value} onChangeVisible={(e: boolean) => showPreviewForm.value = e} />
         <a-layout>
           <a-layout-header class="header">
             <div class="page-title">
