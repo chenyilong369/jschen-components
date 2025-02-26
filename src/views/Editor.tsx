@@ -21,6 +21,7 @@ import useSaveWork from '@/hooks/useSaveWork';
 import usePublishWork from '@/hooks/usePublishWork';
 import PublishForm from './editor/PublishForm';
 import { copyToClipboard } from '@/utils/helper';
+import PreviewForm from './editor/PreviewForm';
 
 export type TabType = 'component' | 'layer' | 'page'
 export default defineComponent({
@@ -39,6 +40,7 @@ export default defineComponent({
     const route = useRoute()
     const currentWorkId = route.params.id
     const showPublishForm = ref(false)
+    const showPreviewForm = ref(false)
     const store = useStore<GlobalDataProps>();
     const components = computed(() => store.state.editor.components)
     const page = computed(() => store.state.editor.page)
@@ -91,6 +93,11 @@ export default defineComponent({
       }
     }
 
+    const preview = async () => {
+      await saveWork(true)
+      showPreviewForm.value = true
+    }
+
     return () => (
       <div class="editor-content">
         <a-modal
@@ -102,6 +109,7 @@ export default defineComponent({
         >
           <PublishForm/>
         </a-modal>
+        <PreviewForm visible={showPreviewForm.value} />
         <a-layout>
           <a-layout-header class="header">
             <div class="page-title">
@@ -123,7 +131,7 @@ export default defineComponent({
               style={{ lineHeight: '64px', width: '520px' }}
             >
               <a-menu-item key="1">
-                <a-button type="primary">预览和设置</a-button>
+                <a-button type="primary" onClick={preview}>预览和设置</a-button>
               </a-menu-item>
               <a-menu-item key="2">
                 <a-button type="primary" onClick={saveWork} loading={saveIsLoading.value}>保存</a-button>

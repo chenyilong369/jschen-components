@@ -6,8 +6,9 @@ import { useStore } from 'vuex'
 import { forEach } from 'lodash-es'
 import useSaveWork from '@/hooks/useSaveWork'
 import { generateQRCode, timeout } from '@/utils/helper'
-import StyledUploader from '@/components/StyledUploader.vue'
+import StyledUploader from '@/components/StyledUploader'
 import { RespUploadData } from '@/store/respTypes'
+import '@/styles/editor/PreviewForm.scss'
 const { useForm } = Form
 export default defineComponent({
   props: {
