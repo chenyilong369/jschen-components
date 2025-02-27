@@ -16,7 +16,7 @@ export default defineComponent({
     const currentUser = computed(() => store.state.user)
 
     onMounted(() => {
-      store.dispatch('fetchTemplates')
+      store.dispatch('fetchTemplates', { searchParams: { pageIndex: 0, pageSize: 8 } })
       if (!currentUser.value.isLogin && currentUser.value.token) {
         axios.defaults.headers.common.Authorization = `Bearer ${currentUser.value.token}`
         store.dispatch('fetchCurrentUser').catch(() => {
