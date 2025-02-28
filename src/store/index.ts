@@ -41,6 +41,7 @@ export function actionWrapper(url: string, commitName: string, config: AxiosRequ
       // 另外一种方式
       // newURL += '?' + objToQueryString(searchParams)
     }
+    console.log(newURL)
     const resp = await axios(newURL, newConfig)
     successMessage && message.success(successMessage)
     context.commit(commitName, { payload ,...resp.data})

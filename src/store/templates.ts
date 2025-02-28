@@ -1,7 +1,7 @@
 import { Module } from "vuex";
-import { GlobalDataProps } from ".";
+import { actionWrapper, GlobalDataProps } from ".";
 import axios from "axios";
-import { RespListData } from "./respTypes";
+import { RespData, RespListData } from "./respTypes";
 
 export interface TemplateProps {
   id: number;
@@ -81,12 +81,16 @@ export const testData: TemplateProps[] = [
 export interface TemplatesProps {
   totalTemplates: number;
   data: TemplateProps[];
+  works: TemplateProps[];
+  totalWorks: number;
 }
 
 const templates: Module<TemplatesProps, GlobalDataProps> = {
   state: {
     data: testData,
-    totalTemplates: 0
+    totalTemplates: 0,
+    works: [],
+    totalWorks: 0
   },
   getters: {
     getTemplateById: (state) => (id: number) => {
@@ -99,13 +103,19 @@ const templates: Module<TemplatesProps, GlobalDataProps> = {
       state.data = [ ...state.data, ...(list || []) ]
       state.totalTemplates = count
     },
+    fetchWorks(state, rawData: RespListData<TemplateProps>) {
+      const { count, list } = rawData.data
+      state.works = list
+      state.totalWorks = count
+    },
+    fetchTemplate(state, rawData: RespData<TemplateProps>) {
+      state.data = [rawData.data]
+    }
   },  
   actions: {
-    fetchTemplates: (context) => {
-      return axios.get('/templates').then(resp => {
-        context.commit('fetchTemplates', resp)
-      })
-    } 
+    fetchTemplates: actionWrapper('/templates', 'fetchTemplates'),
+    fetchWorks: actionWrapper('/works', 'fetchWorks'),
+    fetchTemplate: actionWrapper('/templates/:id', 'fetchTemplate')
   }
 }
 
