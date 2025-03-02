@@ -1,43 +1,38 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Home from '../views/Home';
-import Editor from '../views/Editor';
 import TemplateDetail from '../views/TemplateDetail';
 import store from "@/store";
 import axios from "axios";
+import Index from "@/views/Index";
+import Work from "@/views/Works";
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: Home,
-      meta: {
-        withHeader: true
-      }
+      name: 'index',
+      component: Index,
+      children: [
+        { path: '', name: 'home', component: Home, meta: {title: '欢迎来到拖拖平台'} },
+        { path: 'template/:id', component: TemplateDetail, meta: { title: '模板详情' } },
+        { path: 'works', component: Work, meta: { title: '我的作品', requireLogin: true } }
+      ],
     },
     {
       path: '/editor/:id',
       name: 'editor',
-      component: Editor,
+      component: () => import(/* webpackChunkName: "editor" */ '../views/Editor'),
       meta: {
-        withHeader: false,
+        notWithHeader: true,
         requiredLogin: true,
-      }
-    },
-    {
-      path: '/template/:id',
-      name: 'template',
-      component: TemplateDetail,
-      meta: {
-        withHeader: true 
       }
     },
     {
       path: '/login',
       name: 'login',
       component: () => import(/* webpackChunkName: "login" */ '../views/Login'),
-      meta: { redirectAlreadyLogin: true, title: '登录', disableLoading: true }
+      meta: { redirectAlreadyLogin: true, title: '登录', disableLoading: true, notWithHeader: true }
     }
   ]
 });

@@ -30,7 +30,7 @@ export default defineComponent({
             <a-spin tip="读取中" class="global-spinner" />
           ): null
         }
-        <Index />
+            <router-view/>
       </>
 
     )

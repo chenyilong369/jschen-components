@@ -20,7 +20,6 @@ import InlineInput from '@/components/InlineInput';
 import useSaveWork from '@/hooks/useSaveWork';
 import usePublishWork from '@/hooks/usePublishWork';
 import PublishForm from './editor/PublishForm';
-import { copyToClipboard } from '@/utils/helper';
 import PreviewForm from './editor/PreviewForm';
 
 export type TabType = 'component' | 'layer' | 'page'

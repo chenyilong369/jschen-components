@@ -2,9 +2,10 @@ import { defineComponent, computed, onMounted, ref, nextTick } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { GlobalDataProps } from '@/store/index'
-import WorksList from '@/components/WorksList.vue'
+import WorksList from '@/components/WorksList'
 import useLoadMore from '@/hooks/useLoadMore'
 import { Item } from 'ant-design-vue/es/menu'
+import '@/styles/Works.scss'
 export default defineComponent({
   components: {
     WorksList
@@ -18,6 +19,7 @@ export default defineComponent({
     const isTemplate = ref(0)
     const searchParams = computed(() => ({ pageIndex: 0, pageSize: 4, isTemplate: isTemplate.value }))
     onMounted(() => {
+      console.log(1111)
       store.dispatch('fetchWorks', { searchParams: searchParams.value })
     })
     const { isLastPage, loadMorePage, isFirstPage,
@@ -70,7 +72,7 @@ export default defineComponent({
         <a-row type="flex" justify="space-between" align="middle" class="poster-title" >
           <h2>我的作品和模版</h2>
         </a-row>
-        <a-tabs onChange={this.changeCategory}>
+        <a-tabs onChange={(e: any) => this.changeCategory(e)}>
           <a-tab-pane key="0" tab="我的作品">
           </a-tab-pane>
           <a-tab-pane key="1" tab="我的模版">
@@ -92,13 +94,13 @@ export default defineComponent({
         }
 
 
-        <works-list
+        <WorksList
           list={this.works} onDelete={this.onDelete}
           onCopy={this.onCopy} loading={this.isLoading}
         >
-        </works-list>
-        <a-row type="flex" justify="space-between" align="middle">
-          <ul class="ant-pagination">
+        </WorksList>
+        <a-row  justify="space-between" align="middle">
+          <ul class="ant-pagination" style={{display: 'flex'}}>
             <li class={{ 'ant-pagination-disabled': this.isFirstPage, 'ant-pagination-prev': true }}>
               <a-button class="ant-pagination-item-link" onClick={this.loadPrevPage}>
                 上一页
@@ -107,13 +109,13 @@ export default defineComponent({
             {
               this.pageArr.map(item => (
                 <li key={item} class={{ 'ant-pagination-item': true, 'ant-pagination-item-active': (this.pageIndex + 1) === item }}>
-                  <a-button onClick={this.goToPage(item - 1)}>{item}</a-button>
+                  <a-button onClick={() => this.goToPage(item - 1)}>{item}</a-button>
                 </li >
               ))
             }
 
             <li class={{ 'ant-pagination-next': true, 'ant-pagination-disabled': this.isLastPage }}>
-              <a-button class="ant-pagination-item-link" onClick={this.loadMorePage}>
+              <a-button class="ant-pagination-item-link" onClick={() => this.loadMorePage()}>
                 下一页
               </a-button>
             </li >
@@ -122,13 +124,13 @@ export default defineComponent({
           <h2>{this.pageIndex}</h2>
           {
             !this.isFirstPage ? (
-              <a-button type="primary" size="large" onClick={this.loadPrevPage} loading={this.isLoading} > 上一页</a-button>
+              <a-button type="primary" size="large" onClick={() => this.loadPrevPage()} loading={this.isLoading} > 上一页</a-button>
             ) : null
           }
 
           {
             !this.isLastPage ? (
-              <a-button type="primary" size="large" onClick={this.loadMorePage} loading={this.isLoading} > 下一页</a-button>
+              <a-button type="primary" size="large" onClick={() => this.loadMorePage()} loading={this.isLoading} > 下一页</a-button>
             ) : null
           }
         </a-row>

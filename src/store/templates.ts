@@ -2,81 +2,75 @@ import { Module } from "vuex";
 import { actionWrapper, GlobalDataProps } from ".";
 import axios from "axios";
 import { RespData, RespListData } from "./respTypes";
+import { PageData } from "./editor";
 
-export interface TemplateProps {
-  id: number;
-  title: string;
-  coverImg: string;
-  author: string;
-  copiedCount: number;
-  isHot: boolean;
-  isNew: boolean;
-}
+export type TemplateProps = Required<Omit<PageData, 'props' | 'setting'>>
 
-export const testData: TemplateProps[] = [
-  {
-    id: 1,
-    coverImg: "https://images.pexels.com/photos/27582996/pexels-photo-27582996/free-photo-of-a-statue-of-arco-da-rua-augusto-in-lisbon.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
-    author: "jschen",
-    copiedCount: 10,
-    title: "sdasd1",
-    isHot: true,
-    isNew: true,
-  },
-  {
-    id: 2,
-    coverImg: "https://images.pexels.com/photos/27582996/pexels-photo-27582996/free-photo-of-a-statue-of-arco-da-rua-augusto-in-lisbon.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
-    author: "jschen",
-    copiedCount: 10,
-    title: "sdasd",
-    isHot: true,
-    isNew: true,
-  }, {
-    id: 3,
-    coverImg: "https://images.pexels.com/photos/27582996/pexels-photo-27582996/free-photo-of-a-statue-of-arco-da-rua-augusto-in-lisbon.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
-    author: "jschen",
-    copiedCount: 10,
-    title: "sdasd",
-    isHot: true,
-    isNew: true,
-  }
-  , {
-    id: 4,
-    coverImg: "https://images.pexels.com/photos/27582996/pexels-photo-27582996/free-photo-of-a-statue-of-arco-da-rua-augusto-in-lisbon.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
-    author: "jschen",
-    copiedCount: 10,
-    title: "sdasd",
-    isHot: true,
-    isNew: true,
-  }
-  , {
-    id: 5,
-    coverImg: "https://images.pexels.com/photos/27582996/pexels-photo-27582996/free-photo-of-a-statue-of-arco-da-rua-augusto-in-lisbon.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
-    author: "jschen",
-    copiedCount: 10,
-    title: "sdasd",
-    isHot: true,
-    isNew: true,
-  }
-  , {
-    id: 6,
-    coverImg: "https://images.pexels.com/photos/27582996/pexels-photo-27582996/free-photo-of-a-statue-of-arco-da-rua-augusto-in-lisbon.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
-    author: "jschen",
-    copiedCount: 10,
-    title: "sdasd",
-    isHot: true,
-    isNew: true,
-  }
-  , {
-    id: 7,
-    coverImg: "https://images.pexels.com/photos/27582996/pexels-photo-27582996/free-photo-of-a-statue-of-arco-da-rua-augusto-in-lisbon.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
-    author: "jschen",
-    copiedCount: 10,
-    title: "sdasd",
-    isHot: true,
-    isNew: true,
-  }
-]
+
+// export const testData: TemplateProps[] = [
+//   {
+//     id: 1,
+//     coverImg: "https://images.pexels.com/photos/27582996/pexels-photo-27582996/free-photo-of-a-statue-of-arco-da-rua-augusto-in-lisbon.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
+//     author: "jschen",
+//     copiedCount: 10,
+//     title: "sdasd1",
+//     isHot: true,
+//     isNew: true,
+//   },
+//   {
+//     id: 2,
+//     coverImg: "https://images.pexels.com/photos/27582996/pexels-photo-27582996/free-photo-of-a-statue-of-arco-da-rua-augusto-in-lisbon.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
+//     author: "jschen",
+//     copiedCount: 10,
+//     title: "sdasd",
+//     isHot: true,
+//     isNew: true,
+//   }, {
+//     id: 3,
+//     coverImg: "https://images.pexels.com/photos/27582996/pexels-photo-27582996/free-photo-of-a-statue-of-arco-da-rua-augusto-in-lisbon.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
+//     author: "jschen",
+//     copiedCount: 10,
+//     title: "sdasd",
+//     isHot: true,
+//     isNew: true,
+//   }
+//   , {
+//     id: 4,
+//     coverImg: "https://images.pexels.com/photos/27582996/pexels-photo-27582996/free-photo-of-a-statue-of-arco-da-rua-augusto-in-lisbon.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
+//     author: "jschen",
+//     copiedCount: 10,
+//     title: "sdasd",
+//     isHot: true,
+//     isNew: true,
+//   }
+//   , {
+//     id: 5,
+//     coverImg: "https://images.pexels.com/photos/27582996/pexels-photo-27582996/free-photo-of-a-statue-of-arco-da-rua-augusto-in-lisbon.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
+//     author: "jschen",
+//     copiedCount: 10,
+//     title: "sdasd",
+//     isHot: true,
+//     isNew: true,
+//   }
+//   , {
+//     id: 6,
+//     coverImg: "https://images.pexels.com/photos/27582996/pexels-photo-27582996/free-photo-of-a-statue-of-arco-da-rua-augusto-in-lisbon.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
+//     author: "jschen",
+//     copiedCount: 10,
+//     title: "sdasd",
+//     isHot: true,
+//     isNew: true,
+//   }
+//   , {
+//     id: 7,
+//     coverImg: "https://images.pexels.com/photos/27582996/pexels-photo-27582996/free-photo-of-a-statue-of-arco-da-rua-augusto-in-lisbon.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
+//     author: "jschen",
+//     copiedCount: 10,
+//     title: "sdasd",
+//     isHot: true,
+//     isNew: true,
+//   }
+// ]
 
 export interface TemplatesProps {
   totalTemplates: number;
@@ -87,7 +81,7 @@ export interface TemplatesProps {
 
 const templates: Module<TemplatesProps, GlobalDataProps> = {
   state: {
-    data: testData,
+    data: [],
     totalTemplates: 0,
     works: [],
     totalWorks: 0

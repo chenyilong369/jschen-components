@@ -30,7 +30,7 @@ const useLoadMore = (actionName: string, total: ComputedRef<number>, params: Loa
   const isFirstPage = computed(() => requestParams.pageIndex === 0)
   const totalPage = computed(() => Math.ceil(total.value / params.pageSize))
   const isLastPage = computed(() => {
-    return Math.ceil(total.value / params.pageSize) === requestParams.value + 1
+    return Math.ceil(total.value / params.pageSize) === requestParams.pageIndex + 1
   })
   const pageIndex = toRef(requestParams, 'pageIndex')
   return {

@@ -3,7 +3,7 @@ import axios from 'axios'
 import { v4 } from "uuid";
 import '@/styles/components/Uploader.scss'
 import { DeleteOutlined, LoadingOutlined, FileOutlined } from '@ant-design/icons-vue'
-import { last } from "lodash";
+import { last } from "lodash-es";
 
 type UploadStatus = 'ready' | 'success' | 'error' | 'loading'
 type FileListType = 'picture' | 'text'
