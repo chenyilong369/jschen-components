@@ -62,7 +62,7 @@ export default defineComponent({
               }}
             </a-tooltip>
           </div >
-          {
+          {/* {
             this.histories.map((item, index) => {
               return (
                 <li key={item.id}>
@@ -70,7 +70,7 @@ export default defineComponent({
                 </li >
               )
             })
-          }
+          } */}
         </div >
       </>
     )

@@ -2,7 +2,8 @@
 
 import { Avatar, Button, Spin, Modal, Drawer, Card, Tag,
   Layout, Tabs, Menu, Row, Col, 
-  Form, Dropdown, Input, InputNumber, Slider, Radio, Select } from 'ant-design-vue'
+  Form, Dropdown, Input, InputNumber, Slider, Radio, Select, 
+  Tooltip} from 'ant-design-vue'
 import { App } from 'vue'
 const components = [
   Avatar,
@@ -11,6 +12,7 @@ const components = [
   Modal,
   Drawer,
   Card,
+  
   Card.Meta,
   Tag,
   Layout,
@@ -34,6 +36,7 @@ const components = [
   Slider,
   Radio.Group,
   Radio.Button,
+  Tooltip,
   Select,
   Select.Option
 ]

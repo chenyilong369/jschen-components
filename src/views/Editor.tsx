@@ -106,7 +106,7 @@ export default defineComponent({
           width="700px"
           footer={null}
         >
-          <PublishForm/>
+          <PublishForm />
         </a-modal>
         <PreviewForm visible={showPreviewForm.value} onChangeVisible={(e: boolean) => showPreviewForm.value = e} />
         <a-layout>
@@ -198,7 +198,7 @@ export default defineComponent({
                               props={currentElement.value.props}
                               onChange={handleChange}
                             />
-                            {currentElement.value ? <a-button type="primary" onClick={deleteComponent}>删除组件</a-button> : ''}
+                            {/* {currentElement.value ? <a-button type="primary" onClick={deleteComponent}>删除组件</a-button> : ''} */}
                           </>
                         ) : (
                           <div>
@@ -216,9 +216,20 @@ export default defineComponent({
                         )
                       }
                     </>
-                  ) : null
+                  ) : (
+                    <div>
+                      <a-empty>
+                        {
+                          {
+                            description: () => <p>请选择一个组件来展示属性</p>,
+                            default: () => ''
+                          }
+                        }
+                      </a-empty>
+                    </div>
+                  )
                 }
-                <pre>
+                {/* <pre>
                   {Object.keys(currentElement.value?.props || {}).map((item) => {
                     return (
                       <div>
@@ -226,7 +237,7 @@ export default defineComponent({
                       </div>
                     )
                   })}
-                </pre>
+                </pre> */}
 
               </a-tab-pane>
 

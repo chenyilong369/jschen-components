@@ -5,7 +5,7 @@ import JschenBricks from 'jschen-bricks'
 import 'jschen-bricks/dist/app.css'
 import router from './routes';
 import 'cropperjs/dist/cropper.css'
-import Antd from './configAntD';
+import Antd from 'ant-design-vue';
 import store from './store';
 import 'ant-design-vue/dist/reset.css';
 import { RespData } from './store/respTypes'
@@ -18,6 +18,7 @@ const baseBackendUrl = 'http://127.0.0.1:3000'
 const baseH5URL = ''
 axios.defaults.baseURL = `${baseBackendUrl}/api/`
 
+// 设置 loading 效果
 axios.interceptors.request.use(config => {
   const newConfig = config as ICustomAxiosConfig
   store.commit('setError', { status: false, message: '' })

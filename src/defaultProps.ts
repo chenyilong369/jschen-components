@@ -1,4 +1,6 @@
 import { mapValues, without } from "lodash-es"
+
+// 属性菜单值
 export interface CommonComponentProps {
   // actions
   actionType: string;
